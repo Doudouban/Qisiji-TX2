@@ -52,7 +52,7 @@ int cloud_save ;
 float angle_E;
 mutex mutex_;
 
-void box_height_grub(const Mat& p3d)
+bool box_height_grub(const Mat& p3d)
 {
     clock_t box_height_start = clock();
     int depth_h = p3d.rows;
@@ -81,13 +81,17 @@ void box_height_grub(const Mat& p3d)
 
             cout <<"box_height = "<<box_height.size() << endl;
 
-
+    if(box_height.size()==0)
+        return false;
+    else {
     sort(box_height.begin(), box_height.end(),greater<int>());            ///把高度信息进行从小到大排序///
     int final_height = 0;
     for(int k = 5; k < 15 ; k++)
     {
         final_height = final_height + box_height[k];
     }
+
+
     final_height = final_height / 10;               ///取其中10个值的平均为车高///
     height_of_basket = final_height;  //重置车斗 高度
     clock_t box_height_end = clock();
@@ -102,6 +106,8 @@ void box_height_grub(const Mat& p3d)
     cout << "fianl_height = " <<final_height << endl;
     //cout << "box_height_grub_time = " << (box_height_end - box_height_start) / 1000 << " ms" << endl;
     cout << endl;
+    return true;
+    }
 }
 
 //坐标转换 世界坐标到像素坐标
@@ -219,8 +225,8 @@ void fallPointFind(Point2f* vertex_original, vector<Point2f>& fallPoints_2D )
     {
         cout<<vertex_original[i].x<<" "<<vertex_original[i].y<<endl;
     }
-    Point midPoint_1 = Point((vertex_original[0].x+vertex_original[1].x)/2 , (vertex_original[0].y+vertex_original[1].y)/2) ;
-    Point midPoint_2 = Point((vertex_original[2].x+vertex_original[3].x)/2 , (vertex_original[2].y+vertex_original[3].y)/2) ;
+    Point midPoint_left = Point((vertex_original[0].x+vertex_original[1].x)/2 , (vertex_original[0].y+vertex_original[1].y)/2) ;
+    Point midPoint_right = Point((vertex_original[2].x+vertex_original[3].x)/2 , (vertex_original[2].y+vertex_original[3].y)/2) ;
 
     int fallPoint_num = 10;
     int fall_start = int(2*300*(-1));//左2,右3情况
@@ -228,10 +234,10 @@ void fallPointFind(Point2f* vertex_original, vector<Point2f>& fallPoints_2D )
     {
         //假设机械臂所在的直线投影是x = 0;
         float x_fall = fall_start+fall_step*j;
-        if( x_fall > (midPoint_1.x +thick_of_box) && x_fall < (midPoint_2.x -thick_of_box))
+        if( x_fall > (midPoint_left.x +thick_of_box) && x_fall < (midPoint_right.x -thick_of_box))
         {
             Point fallPoint = Point (x_fall, 0);
-            fallPoint.y = (x_fall - midPoint_1.x)*(midPoint_2.y - midPoint_1.y) / (midPoint_2.x - midPoint_1.x) + midPoint_1.y;     ///求出中间横线的方程，用两点式求落点y轴坐标//
+            fallPoint.y = (x_fall - midPoint_left.x)*(midPoint_right.y - midPoint_left.y) / (midPoint_right.x - midPoint_left.x) + midPoint_left.y;     ///求出中间横线的方程，用两点式求落点y轴坐标//
             if((fallPoint.y>vertex_original[0].y && fallPoint.y<vertex_original[1].y)||(fallPoint.y<vertex_original[0].y && fallPoint.y>vertex_original[1].y))
             fallPoints_2D.push_back(Point(fallPoint.x , fallPoint.y));
         }

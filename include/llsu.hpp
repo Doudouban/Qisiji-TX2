@@ -42,7 +42,7 @@ void quantized();
 //获取参数
 void param();
 //车筐高度获取
-void box_height_grub(const Mat& p3d);
+bool box_height_grub(const Mat& p3d);
 
 //坐标转换 世界坐标到像素坐标
 void co_transfer(const Point3f* corners,vector<Point>& corners_pixel);

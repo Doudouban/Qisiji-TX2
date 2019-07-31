@@ -1,14 +1,27 @@
 // g++ -Wall main.cpp can_bus_jetson.cpp -o main
 // sudo ./main
 
+//  // jetsonTX2 GPIO 原装载板
 //    CAN口  ->  Signal     J26接口    CAN收发器
-//----------->----------------------------------
+//----------------------------------------------
 //    CAN0  ->  CAN0_RX  ->  Pin5   ->  RX
 //    CAN0  ->  CAN0_TX  ->  Pin7   ->  TX
 //          ->  VDD_3V3  ->  Pin2   ->  VCC
 //          ->  GND      ->  Pin10  ->  GND
+//----------------------------------------------
 //    CAN1  ->  CAN1_RX  ->  Pin15  ->  RX
 //    CAN1  ->  CAN1_TX  ->  Pin17  ->  TX
+
+// jetsonTX2 GPIO 图为007载板
+//    CAN口  ->  Signal     J26接口    CAN收发器
+//----------->---------------------------------
+//    CAN0  ->  CAN0_TX  ->  Pin23  ->  TX
+//    CAN0  ->  CAN0_RX  ->  Pin24  ->  RX
+//          ->  3V3      ->  Pin1   ->  VCC
+//          ->  GND      ->  Pin19  ->  GND
+//---------------------------------------------
+//    CAN1  ->  CAN1_TX  ->  Pin21  ->  TX
+//    CAN1  ->  CAN1_RX  ->  Pin22  ->  RX
 
 #include "can_jetson.hpp"
 #include <iostream>
@@ -26,12 +39,11 @@
 using namespace std;
 
 // TODO
-
 //默认can0波特率500k
 // int can_init(int device = 0,int bitrate=500000,int mode=0) {
 int can_init() {
   // 安装canbus模块
-  system("sudo modprobe can");    // 插入can总线子系统
+  system("sudo modprobe can");     // 插入can总线子系统
   system("sudo modprobe can_dev"); // 插入can_dev模块
   system("sudo modprobe can-raw"); // 插入can原始协议模块
   system("sudo modprobe can-bcm"); // the broadcast manager (BCM)
@@ -56,7 +68,7 @@ int can_closed() {
   return 0;
 }
 
-//-----------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------
 // TODO
 //  Usage: can_send <device> <can_frame>
 //  <can_frame>: <can_id>#{R|data}          //for CAN 2.0 frames
@@ -64,19 +76,17 @@ int can_closed() {
 //  <can_id> ：3位或8位16进制数，3位标准数据帧，8位扩展帧
 //  {data}： 0..8字节，最多16位数据，16进制数， (可以使用.作为分隔符)
 //  {R}：发送远程帧
-//-----------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------
 //  #标准数据帧
 //  cansend( can0 5A1#1122334455667788 ) #
 //  <can_id>为0x5A1，data数据内容为0x1122334455667788 #扩展帧 cansend( can0
 //  12345678#aabbccdd ) # <can_id>为0x12345678，<data>内容为0xaabbccdd #远程帧
 //  cansend( can0 123#R7 )  # <can_id>为0x123，长度为7
-//-----------------------------------------------------------------------------------------
-
+//--------------------------------------------------------------------------
 // 终端命令 cansend can0 5A1#1122334455667788
 // 函数调用 cansend(can0，5A1#1122334455667788)
-
-// int can_send(int device = 0) {
-void can_send(const int& can_id, const int& can_dlc, const array<int,8>& a) {
+//void can_send(const int &can_device,const int &can_id, const int &can_dlc, const array<int, 8> &a) {
+void can_send(const int &can_id, const int &can_dlc, const array<int, 8> &a) {
   int ret;
   int s, nbytes;
   struct sockaddr_can addr;
@@ -84,15 +94,12 @@ void can_send(const int& can_id, const int& can_dlc, const array<int,8>& a) {
   struct can_frame frame;
   memset(&frame, 0, sizeof(struct can_frame));
 
-  //  system("sudo ip link set can0 type can bitrate 100000");
-  //  system("sudo ifconfig can0 up");
-  printf("this is a can send demo\r\n");
+  printf("### CAN send function ###\r\n");
 
   // 1.Create socket
   s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
   if (s < 0) {
     perror("socket PF_CAN failed");
-
   }
 
   // 2.Specify can0 device
@@ -100,7 +107,6 @@ void can_send(const int& can_id, const int& can_dlc, const array<int,8>& a) {
   ret = ioctl(s, SIOCGIFINDEX, &ifr);
   if (ret < 0) {
     perror("ioctl failed");
-
   }
 
   // 3.Bind the socket to can0
@@ -109,7 +115,6 @@ void can_send(const int& can_id, const int& can_dlc, const array<int,8>& a) {
   ret = bind(s, (struct sockaddr *)&addr, sizeof(addr));
   if (ret < 0) {
     perror("bind failed");
-
   }
 
   // 4.Disable filtering rules, do not receive packets, only send
@@ -148,7 +153,7 @@ void can_send(const int& can_id, const int& can_dlc, const array<int,8>& a) {
 //-----------------------------------------------------------
 // TODO
 // int can_receive(int device=0,int can_id=0) {
-void can_receive(int& id, array<int,8>& a) {
+void can_receive(int &id, array<int, 8> &a) {
   int ret;
   int s, nbytes;
   unsigned long len;
@@ -166,7 +171,6 @@ void can_receive(int& id, array<int,8>& a) {
   s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
   if (s < 0) {
     perror("socket PF_CAN failed");
-
   }
 
   // 2.Specify can0 device
@@ -174,7 +178,6 @@ void can_receive(int& id, array<int,8>& a) {
   ret = ioctl(s, SIOCGIFINDEX, &ifr);
   if (ret < 0) {
     perror("ioctl failed");
-
   }
 
   // 3.Bind the socket to can0
@@ -183,9 +186,7 @@ void can_receive(int& id, array<int,8>& a) {
   ret = bind(s, (struct sockaddr *)&addr, sizeof(addr));
   if (ret < 0) {
     perror("bind failed");
-
   }
-
 
   // 4.Define receive rules
   /*struct can_filter rfilter[1];
@@ -198,13 +199,12 @@ void can_receive(int& id, array<int,8>& a) {
     nbytes = read(s, &frame, sizeof(frame));
     if (nbytes > 0) {
       printf("can_id = 0x%X\r\ncan_dlc = %d \r\n", frame.can_id, frame.can_dlc);
-      id=frame.can_id;
+      id = frame.can_id;
       int i = 0;
-      for (i = 0; i < 8; i++){
-          printf("data[%d] = %d\r\n", i, frame.data[i]);
-          a[i]=frame.data[i];
+      for (i = 0; i < 8; i++) {
+        printf("data[%d] = %d\r\n", i, frame.data[i]);
+        a[i] = frame.data[i];
       }
-
 
       break;
     }
@@ -213,7 +213,4 @@ void can_receive(int& id, array<int,8>& a) {
   // 6.Close the socket and can0
   close(s);
   //  system("sudo ifconfig can0 down");
-
 }
-
-

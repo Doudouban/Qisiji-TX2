@@ -1,110 +1,105 @@
-#include <limits>
-#include <cassert>
-#include <cmath>
-#include <time.h>
-#include <thread>
-
-#include "../include/common.hpp"
-#include "../include/llsu.hpp"
-#include "../include/ddban.h"
+#include "common.hpp"
+#include "ddban.h"
+#include "llsu.hpp"
 #include "can_jetson.hpp"
 #include "jetsonGPIO.hpp"
 #include "key_jetson.hpp"
-
-#include <QApplication>
 #include "mainwindow.h"
+#include <QApplication>
+#include <cassert>
+#include <cmath>
+#include <limits>
+#include <thread>
+#include <time.h>
 
-
-static char buffer[1024*1024*20];
-static int  n;
+static char buffer[1024 * 1024 * 20];
+static int n;
 static volatile bool exit_main;
 static volatile bool save_frame;
 
 //主函数全局变量声明
-//vector<Point2f> fallPoints_2D;//2D点阵图中不加平移的落点集
+// vector<Point2f> fallPoints_2D;//2D点阵图中不加平移的落点集
 //车斗相关参数mm(默认值)
 extern int height_of_basket; //车筐的高度
-extern int range_low ;
-extern int range_high ;//作为高度是否正确的判断条件,同时作为车筐边沿提取的上下边界值
+extern int range_low;
+extern int range_high; //作为高度是否正确的判断条件,同时作为车筐边沿提取的上下边界值
 extern int new_rang_low;
 extern int new_rang_high;
-extern int range_down ;
-extern int range_up ;// 作为车斗上下高度截取的范围
+extern int range_down;
+extern int range_up; // 作为车斗上下高度截取的范围
 extern int ds;
 
-extern int fall_step ;//落点之间的间距
-extern int thick_of_box;//箱子的边缘厚度
+extern int fall_step;    //落点之间的间距
+extern int thick_of_box; //箱子的边缘厚度
 extern int z_range_x;
-extern int z_range_y;//求取落点高度平均值的范围
-extern int plu; //二次寻找落点平均高度时拓宽的范围倍数
-extern int symbol_step;//根据满溢程度标记落点
-
-extern int window_size;//窗口大小
-extern int pipe_range ; //绘制喷洒的范围离中心列的距离 cols/pipe_range
-//int first_frame=8;//起始帧 debug param
-//int last_frame=99;//尾帧数 debug param
-
+extern int z_range_y;   //求取落点高度平均值的范围
+extern int plu;         //二次寻找落点平均高度时拓宽的范围倍数
+extern int symbol_step; //根据满溢程度标记落点
+extern int window_size; //窗口大小
+extern int pipe_range; //绘制喷洒的范围离中心列的距离 cols/pipe_range
+// int first_frame=8;//起始帧 debug param
+// int last_frame=99;//尾帧数 debug param
 extern int results_save;
-extern int depth_save ;
-extern int color_save ;
-extern int cloud_save ;
+extern int depth_save;
+extern int color_save;
+extern int cloud_save;
 
 bool key_detection = false;
-bool key_hegih = false;
+bool key_height = false;
 bool key_background = false;
-
 bool has_Color = false;
 bool get_height = true;
 bool key_ = true;
 int detection = 1;
+
 static TY_CAMERA_INTRINSIC m_colorIntrinsic;
 
 static int linepoints_mistime = 0;
 
-
 struct CallbackData {
-    int             index;
-    TY_DEV_HANDLE   hDevice;
-    DepthRender*    render;
+  int index;
+  TY_DEV_HANDLE hDevice;
+  DepthRender *render;
 
-    TY_CAMERA_DISTORTION color_dist;
-    TY_CAMERA_INTRINSIC color_intri;
+  TY_CAMERA_DISTORTION color_dist;
+  TY_CAMERA_INTRINSIC color_intri;
 };
 
-void while_key(){
-    while(key_){
+void while_key() {
+    while (key_) {
         key();
-
     }
     gpio_close();
 }
-void while_control(control &a){
-    while(key_){
+
+void while_control(control &a) {
+    while (key_) {
         a.receive_control();
     }
 }
-void handleFrame(TY_FRAME_DATA* frame, void* userdata, MainWindow &w,control& contr1)
-{
+
+void handleFrame(TY_FRAME_DATA *frame, void *userdata, MainWindow &w,
+                 control &contr1) {
     cout << "llsu3" << endl;
-    CallbackData* pData = (CallbackData*) userdata;
+    CallbackData *pData = (CallbackData *) userdata;
     LOGD("=== Get frame %d", ++pData->index);
 
-    Mat depth_ , p3d, color,irl,irr;
+    Mat depth_, p3d, color, irl, irr;
     Mat depth_1;
     parseFrame(*frame, &depth_, &irl, &irr, &color, &p3d);
-    depth_1=depth_;
-    depth_1.convertTo(depth_1, CV_8UC1, 32.0/255);//进行位深度的转换,2->1字节   转换为8位无符号单通道数值，然后乘32.0再除以255；
-    Mat depth = Mat::zeros(depth_1.rows,depth_1.cols,CV_8UC3);
+    depth_1 = depth_;
+    depth_1.convertTo(depth_1, CV_8UC1, 32.0 / 255); //进行位深度的转换,2->1字节
+    //转换为8位无符号单通道数值，然后乘32.0再除以255；
+    Mat depth = Mat::zeros(depth_1.rows, depth_1.cols, CV_8UC3);
     vector<Mat> channels;
-    for (int i=0;i<3;i++)
-     {
-         channels.push_back(depth_1);//进行通道数的转换,从1->3
-     }
-    merge(channels,depth);//合并三个通道，
+    for (int i = 0; i < 3; i++) {
+        channels.push_back(depth_1); //进行通道数的转换,从1->3
+    }
+    merge(channels, depth); //合并三个通道，
 
-  cv::Mat background_pic;
+    cv::Mat background_pic;
     cv::Mat resizedColor;
-    if(!color.empty()){
+    if (!color.empty()) {
         cv::Mat undistort_result(color.size(), CV_8UC3);
         TY_IMAGE_DATA dst;
         dst.width = color.cols;
@@ -118,10 +113,11 @@ void handleFrame(TY_FRAME_DATA* frame, void* userdata, MainWindow &w,control& co
         src.size = color.size().area() * 3;
         src.pixelFormat = TY_PIXEL_FORMAT_RGB;
         src.buffer = color.data;
-        //undistort camera image
-        //TYUndistortImage accept TY_IMAGE_DATA from TY_FRAME_DATA , pixel format RGB888 or MONO8
-        //you can also use opencv API cv::undistort to do this job.
-        ASSERT_OK(TYUndistortImage(&pData->color_intri, &pData->color_dist, NULL, &src, &dst));
+        // undistort camera image
+        // TYUndistortImage accept TY_IMAGE_DATA from TY_FRAME_DATA , pixel format
+        // RGB888 or MONO8 you can also use opencv API cv::undistort to do this job.
+        ASSERT_OK(TYUndistortImage(&pData->color_intri, &pData->color_dist, NULL,
+                                   &src, &dst));
         color = undistort_result;
         cv::resize(color, resizedColor, depth_.size(), 0, 0, CV_INTER_LINEAR);
     }
@@ -129,134 +125,139 @@ void handleFrame(TY_FRAME_DATA* frame, void* userdata, MainWindow &w,control& co
     // do Registration
     cv::Mat newDepth;
     Mat depth_mid;
-    if(!p3d.empty() && !color.empty()) {
-        ASSERT_OK( TYRegisterWorldToColor2(pData->hDevice, (TY_VECT_3F*)p3d.data, 0
-                , p3d.cols * p3d.rows, color.cols, color.rows, (uint16_t*)buffer, sizeof(buffer)
-        ));
-        newDepth = cv::Mat(color.rows, color.cols, CV_16U, (uint16_t*)buffer);
+    if (!p3d.empty() && !color.empty()) {
+        ASSERT_OK(TYRegisterWorldToColor2(
+            pData->hDevice, (TY_VECT_3F *) p3d.data, 0, p3d.cols * p3d.rows,
+            color.cols, color.rows, (uint16_t *) buffer, sizeof(buffer)));
+        newDepth = cv::Mat(color.rows, color.cols, CV_16U, (uint16_t *) buffer);
         cv::Mat resized_color;
         cv::Mat temp;
-        //you may want to use median filter to fill holes in projected depth image or do something else here
-        cv::medianBlur(newDepth,temp,5);//中值滤波
+        // you may want to use median filter to fill holes in projected depth image
+        // or do something else here
+        cv::medianBlur(newDepth, temp, 5); //中值滤波
         newDepth = temp;
-        //resize to the same size for display
+        // resize to the same size for display
         cv::resize(newDepth, newDepth, depth_.size(), 0, 0, 0);
         cv::resize(color, resized_color, depth_.size());
         cv::Mat depthColor = pData->render->Compute(newDepth);
-        depth_mid=depthColor;
-        //depthColor = depthColor / 2 + resized_color / 2;
-        //cv::imshow("projected depth", depthColor);
+        depth_mid = depthColor;
+        // depthColor = depthColor / 2 + resized_color / 2;
+        // cv::imshow("projected depth", depthColor);
     }
-   //contr1.receive_control();
-if (key_background && w.detec==0)
-    key_background=false;
+    // contr1.receive_control();
+    if (key_background && w.detec == 0)
+        key_background = false;
     if (key_background && w.detec) {
-      background_pic = depth;
-    } else{
+        background_pic = depth;
+    } else {
         background_pic = resizedColor;
-//        w.direction = 0;
+        //        w.direction = 0;
     }
 
-    w.direction=0;
-    cout<<w.direction<<"-------------------------------------------------------"<<endl;
+    w.direction = 0;
+    cout << w.direction
+         << "-------------------------------------------------------" << endl;
     w.key_detect();
-    if(w.detec){
-        if(w.get_height)
-        {
-            cout<<"进入获取高度函数"<<endl;
-            box_height_grub(p3d);                         ////抓取箱子的高度////
-            cout << "------------------>"<<"height_of_basket = " << height_of_basket << endl;    ///height_of_basket变量为车厢的最终高度///
-            if(height_of_basket < range_high && height_of_basket > range_low)
-            {
-                w.get_height = false;////
-                new_rang_low = height_of_basket - range_down;////
-                new_rang_high = height_of_basket + range_up;////
+    if (w.detec) {
+        if (w.get_height) {
+            bool error;
+            cout << "进入获取高度函数" << endl;
+            error= box_height_grub(p3d); ////抓取箱子的高度////
+            if(!error){
+                height_of_basket=0;
+            }
+            cout << "------------------>"
+                 << "height_of_basket = " << height_of_basket
+                 << endl; /// height_of_basket变量为车厢的最终高度///
+            if (height_of_basket < range_high && height_of_basket > range_low) {
+                w.get_height = false;                         ////
+                new_rang_low = height_of_basket - range_down; ////
+                new_rang_high = height_of_basket + range_up;  ////
             }
 
-            w.height = height_of_basket;//-contr1.car_up;
-        }   ///从新设置一下用来截取高度的范围rang_low   high;/////
-
-
+            w.height = height_of_basket; //-contr1.car_up;
+        } ///从新设置一下用来截取高度的范围rang_low   high;/////
 
         //------------从相机抓取数据----------------------///
 
-        Point3f *cloud_3f = (Point3f*)p3d.data;
+        Point3f *cloud_3f = (Point3f *) p3d.data;
         int num = p3d.rows * p3d.cols / ds;
 
         clock_t start_alg = clock();
         //车筐点云的获取
         vector<Point3f> box_world;
         vector<Point2f> linePoints;
-        box_grub(cloud_3f, box_world, linePoints, num);     ///抓取点云图的点，三维放在box_world,二维放在linepoint;////
+        box_grub(cloud_3f, box_world, linePoints,
+                 num); ///抓取点云图的点，三维放在box_world,二维放在linepoint;////
         //边沿识别以及交点定位算法,可视化显示
-        if(linePoints.size() > 50)
-        {
+        if (linePoints.size() > 50) {
             w.index = 1;
             linepoints_mistime = 0;
-            cout<<linePoints.size()<<endl;
+            cout << linePoints.size() << endl;
             //俯视图下的车筐
-            //Mat box_grub=Mat::zeros(length_y,length_x,CV_8UC3);
+            // Mat box_grub=Mat::zeros(length_y,length_x,CV_8UC3);
             //-----对给定的2D点集，寻找最小包围面积-----////
-            Point2f vertex_original[4];//用于存储不加平移二维的角点值
-            Point3f corners[4];//用于存储三维角点值
+            Point2f vertex_original[4]; //用于存储不加平移二维的角点值
+            Point3f corners[4];         //用于存储三维角点值
             //将找到的角点赋给三维点阵，为坐标转换做准备
-            corners_grub (linePoints, vertex_original, corners);
+            corners_grub(linePoints, vertex_original, corners);
 
             //角点坐标转换, 从世界坐标到相机坐标再到像素坐标
             vector<Point> corners_pixel;
-//        co_transfer(corners, corners_pixel);     ///把角点的左边转换成像素坐标
+            //        co_transfer(corners, corners_pixel);
+            //        ///把角点的左边转换成像素坐标
 
             //--------------2D图中寻找饲料落点并绘制----------------///
             vector<Point2f> fallPoints_2D;
-            vector<Point2f> upfallPoints_2D;//2D点阵图中不加平移的落点集
+            vector<Point2f> upfallPoints_2D; // 2D点阵图中不加平移的落点集
             vector<Point2f> downfallPoints_2D;
             //加一个正落点,测试用绘制,也用于最主要的喷洒距离计算
-            Point2f fallPoint_right = Point (0, 0);//世界坐标系下的落点,未经平移
+            Point2f fallPoint_right = Point(0, 0); //世界坐标系下的落点,未经平移
             fallPointFind(vertex_original, fallPoints_2D);
 
             //--------------在depth图中找到饲料落点并绘制---------------///
             //找到落点的Z坐标
             vector<Point3f> fallPoints_world;
 
-            fallPointWorldFind(box_world, fallPoints_2D,fallPoints_world);
-            //fallPointWorldFind(box_world, downfallPoints_2D,fallPoints_world);
-            /*thread t1(fallPointWorldFind, ref(box_world), ref(upfallPoints_2D), ref(fallPoints_world));
-            thread t2(fallPointWorldFind, ref(box_world), ref(downfallPoints_2D), ref(fallPoints_world));
-            t1.join();
-            t2.join();*/
+            fallPointWorldFind(box_world, fallPoints_2D, fallPoints_world);
+            // fallPointWorldFind(box_world, downfallPoints_2D,fallPoints_world);
+            /*thread t1(fallPointWorldFind, ref(box_world), ref(upfallPoints_2D),
+            ref(fallPoints_world)); thread t2(fallPointWorldFind, ref(box_world),
+            ref(downfallPoints_2D), ref(fallPoints_world)); t1.join(); t2.join();*/
             //喷撒规划
-            //fall_rule(fallPoints_world);
+            // fall_rule(fallPoints_world);
             //饲料落点坐标转换, 从世界坐标到相机坐标再到像素坐标
             vector<Point> fallPoints_pixel;
-//        co_transfer_2(fallPoints_world, fallPoints_pixel);///将落点的坐标转换成像素坐标系///
+            //        co_transfer_2(fallPoints_world,
+            //        fallPoints_pixel);///将落点的坐标转换成像素坐标系///
             thread t3(co_transfer, corners, ref(corners_pixel));
             thread t4(co_transfer_2, ref(fallPoints_world), ref(fallPoints_pixel));
             t3.join();
             t4.join();
             //绘制边框,落点
-            //drawBox(depth_mid, fallPoints_world,fallPoints_pixel,corners_pixel );
-            //drawBox(depth, fallPoints_world,fallPoints_pixel,corners_pixel );
+            // drawBox(depth_mid, fallPoints_world,fallPoints_pixel,corners_pixel );
+            // drawBox(depth, fallPoints_world,fallPoints_pixel,corners_pixel );
 
-            vector<Point> fallPoints_pixel_color(4),corners_pixel_color(4);
-/*
-        for(int i=0;i<corners_pixel_color.size();i++)
-        {
-            corners_pixel_color[i].x=corners_pixel[i].x+30;
-            corners_pixel_color[i].y=corners_pixel[i].y;
-            fallPoints_pixel_color[i].x=fallPoints_pixel[i].x+30;
-            fallPoints_pixel_color[i].y=fallPoints_pixel[i].y;
-        }
-*/
-            drawBox(background_pic, fallPoints_world,fallPoints_pixel,corners_pixel );
-            //contr1.vertical_control(fallPoints_2D);//横向控制
-            contr1.traversal_control(fallPoints_world, height_of_basket, symbol_step,w);//纵向控制
+            vector<Point> fallPoints_pixel_color(4), corners_pixel_color(4);
+            /*
+                    for(int i=0;i<corners_pixel_color.size();i++)
+                    {
+                        corners_pixel_color[i].x=corners_pixel[i].x+30;
+                        corners_pixel_color[i].y=corners_pixel[i].y;
+                        fallPoints_pixel_color[i].x=fallPoints_pixel[i].x+30;
+                        fallPoints_pixel_color[i].y=fallPoints_pixel[i].y;
+                    }
+            */
+            drawBox(background_pic, fallPoints_world, fallPoints_pixel,
+                    corners_pixel);
+            // contr1.vertical_control(fallPoints_2D);//zong向控制
+            contr1.traversal_control(fallPoints_world, height_of_basket, symbol_step, w); //heng向控制
 
 
-        }else {
+        } else {
             w.index = 0;
-            if (++linepoints_mistime > 50)
-            {
-                //exit_main = 1;
+            if (++linepoints_mistime > 50) {
+                // exit_main = 1;
                 w.get_height = true;
             }
         }
@@ -265,84 +266,84 @@ if (key_background && w.detec==0)
         int depth_w_left = depth_.cols / 2 - depth_.cols / pipe_range;
         int depth_w_right = depth_.cols / 2 + depth_.cols / pipe_range;
 
-        line(background_pic, Point(depth_w_left,0), Point(depth_w_left,depth_h / 4), Scalar(0,255,0),2,CV_AA);            ///画左边的饲料下落边界
-        line(background_pic, Point(depth_w_right,0), Point(depth_w_right,depth_h / 4), Scalar(0,255,0),2,CV_AA);          ///画右边的饲料下落边界
-
+        line(background_pic, Point(depth_w_left, 0),
+             Point(depth_w_left, depth_h / 4), Scalar(0, 255, 0), 2,
+             CV_AA); ///画左边的饲料下落边界
+        line(background_pic, Point(depth_w_right, 0),
+             Point(depth_w_right, depth_h / 4), Scalar(0, 255, 0), 2,
+             CV_AA); ///画右边的饲料下落边界
     }
     contr1.can_state();
     w.pic = background_pic;
     show(w);
-//    namedWindow("color",CV_WINDOW_NORMAL);
-//    moveWindow("color",10,10);
-//    resizeWindow("color",window_size,window_size);
-//    imshow( "color", resizedColor );
+    //    namedWindow("color",CV_WINDOW_NORMAL);
+    //    moveWindow("color",10,10);
+    //    resizeWindow("color",window_size,window_size);
+    //    imshow( "color", resizedColor );
 
-/*    namedWindow("depth",CV_WINDOW_NORMAL);
-    moveWindow("depth",1000,10);
-    resizeWindow("depth",window_size,window_size);
-    imshow( "depth", depth_mid );*/
+    /*    namedWindow("depth",CV_WINDOW_NORMAL);
+        moveWindow("depth",1000,10);
+        resizeWindow("depth",window_size,window_size);
+        imshow( "depth", depth_mid );*/
 
-
-    //moveWindow("depth_1",100,100);
-    //imshow("depth_1",resizedColor);
+    // moveWindow("depth_1",100,100);
+    // imshow("depth_1",resizedColor);
 
     save_or_not(background_pic, depth_, color, p3d, pData->index);
 
     int key = cv::waitKey(1);
-    switch(key){
-        case -1:
-            break;
-        case 'q': case 1048576 + 'q':
-            exit_main = true;
-            break;
-        case 's': case 1048576 + 's':
-            save_frame = true;
-            break;
-        default:
-            LOGD("Pressed key %d", key);
+    switch (key) {
+    case -1:break;
+    case 'q':
+    case 1048576 + 'q':exit_main = true;
+        break;
+    case 's':
+    case 1048576 + 's':save_frame = true;
+        break;
+    default:LOGD("Pressed key %d", key);
     }
 
-    LOGD("=== Callback: Re-enqueue buffer(%p, %d)", frame->userBuffer, frame->bufferSize);
-    ASSERT_OK( TYEnqueueBuffer(pData->hDevice, frame->userBuffer, frame->bufferSize) );
+    LOGD("=== Callback: Re-enqueue buffer(%p, %d)", frame->userBuffer,
+         frame->bufferSize);
+    ASSERT_OK(
+        TYEnqueueBuffer(pData->hDevice, frame->userBuffer, frame->bufferSize));
 }
 
-
-int main(int argc, char* argv[])
-{
-    const char* IP = NULL;
-    const char* ID = NULL;
+int main(int argc, char *argv[]) {
+    const char *IP = NULL;
+    const char *ID = NULL;
     TY_DEV_HANDLE hDevice;
 
-    for(int i = 1; i < argc; i++){
-        if(strcmp(argv[i], "-id") == 0){
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-id") == 0) {
             ID = argv[++i];
-        }else if(strcmp(argv[i], "-ip") == 0){
+        } else if (strcmp(argv[i], "-ip") == 0) {
             IP = argv[++i];
-        }else if(strcmp(argv[i], "-h") == 0){
+        } else if (strcmp(argv[i], "-h") == 0) {
             LOGI("Usage: SimpleView_Callback [-h] [-ip <IP>]");
             return 0;
         }
     }
 
     LOGD("=== Init lib");
-    ASSERT_OK( TYInitLib() );
-    TY_VERSION_INFO* pVer = (TY_VERSION_INFO*)buffer;
-    ASSERT_OK( TYLibVersion(pVer) );
+    ASSERT_OK(TYInitLib());
+    TY_VERSION_INFO *pVer = (TY_VERSION_INFO *) buffer;
+    ASSERT_OK(TYLibVersion(pVer));
     LOGD("     - lib version: %d.%d.%d", pVer->major, pVer->minor, pVer->patch);
 
-    if(IP) {
+    if (IP) {
         LOGD("=== Open device %s", IP);
-        ASSERT_OK( TYOpenDeviceWithIP(IP, &hDevice) );
+        ASSERT_OK(TYOpenDeviceWithIP(IP, &hDevice));
     } else {
-        if(ID == NULL){
+        if (ID == NULL) {
             LOGD("=== Get device info");
-            ASSERT_OK( TYGetDeviceNumber(&n) );
+            ASSERT_OK(TYGetDeviceNumber(&n));
             LOGD("     - device number %d", n);
 
-            TY_DEVICE_BASE_INFO* pBaseInfo = (TY_DEVICE_BASE_INFO*)buffer;
-            ASSERT_OK( TYGetDeviceList(pBaseInfo, 100, &n) );
+            TY_DEVICE_BASE_INFO *pBaseInfo = (TY_DEVICE_BASE_INFO *) buffer;
+            ASSERT_OK(TYGetDeviceList(pBaseInfo, 100, &n));
 
-            if(n == 0){
+            if (n == 0) {
                 LOGD("=== No device got");
                 return -1;
             }
@@ -350,71 +351,72 @@ int main(int argc, char* argv[])
         }
 
         LOGD("=== Open device: %s", ID);
-        ASSERT_OK( TYOpenDevice(ID, &hDevice) );
+        ASSERT_OK(TYOpenDevice(ID, &hDevice));
     }
 
     int32_t allComps;
-    ASSERT_OK( TYGetComponentIDs(hDevice, &allComps) );
-    if(!(allComps & TY_COMPONENT_RGB_CAM)){
+    ASSERT_OK(TYGetComponentIDs(hDevice, &allComps));
+    if (!(allComps & TY_COMPONENT_RGB_CAM)) {
         LOGE("=== Has no RGB camera, cant do registration");
         return -1;
     }
 
     LOGD("=== Configure components");
     int32_t componentIDs = TY_COMPONENT_POINT3D_CAM | TY_COMPONENT_RGB_CAM;
-    ASSERT_OK( TYEnableComponents(hDevice, componentIDs) );
+    ASSERT_OK(TYEnableComponents(hDevice, componentIDs));
 
     LOGD("=== Prepare image buffer");
     int32_t frameSize;
 
-    //frameSize = 1280 * 960 * (3 + 2 + 2);
-    ASSERT_OK( TYGetFrameBufferSize(hDevice, &frameSize) );
+    // frameSize = 1280 * 960 * (3 + 2 + 2);
+    ASSERT_OK(TYGetFrameBufferSize(hDevice, &frameSize));
     LOGD("     - Get size of framebuffer, %d", frameSize);
     LOGD("     - Allocate & enqueue buffers");
-    char* frameBuffer[2];
+    char *frameBuffer[2];
     frameBuffer[0] = new char[frameSize];
     frameBuffer[1] = new char[frameSize];
     LOGD("     - Enqueue buffer (%p, %d)", frameBuffer[0], frameSize);
-    ASSERT_OK( TYEnqueueBuffer(hDevice, frameBuffer[0], frameSize) );
+    ASSERT_OK(TYEnqueueBuffer(hDevice, frameBuffer[0], frameSize));
     LOGD("     - Enqueue buffer (%p, %d)", frameBuffer[1], frameSize);
-    ASSERT_OK( TYEnqueueBuffer(hDevice, frameBuffer[1], frameSize) );
+    ASSERT_OK(TYEnqueueBuffer(hDevice, frameBuffer[1], frameSize));
 
-    LOGD("=== Register callback");///寄存器回调
+    LOGD("=== Register callback"); ///寄存器回调
     LOGD("Note: Callback may block internal data receiving,");
-    LOGD("      so that user should not do long time work in callback.");
-    LOGD("      To avoid copying data, we pop the framebuffer from buffer queue and");
-    LOGD("      give it back to user, user should call TYEnqueueBuffer to re-enqueue it.");
+    LOGD("so that user should not do long time work in callback.");
+    LOGD("To avoid copying data, we pop the framebuffer from buffer queue and");
+    LOGD("give it back to user, user should call TYEnqueueBuffer to re-enqueue it.");
     DepthRender render;
     CallbackData cb_data;
     cb_data.index = 0;
     cb_data.hDevice = hDevice;
     cb_data.render = &render;
-    //ASSERT_OK( TYRegisterCallback(hDevice, frameCallback, &cb_data) );
+    // ASSERT_OK( TYRegisterCallback(hDevice, frameCallback, &cb_data) );
 
     LOGD("=== Register event callback");
     LOGD("Note: Callback may block internal data receiving,");
     LOGD("      so that user should not do long time work in callback.");
-    //ASSERT_OK(TYRegisterEventCallback(hDevice, eventCallback, NULL));
+    // ASSERT_OK(TYRegisterEventCallback(hDevice, eventCallback, NULL));
 
-    LOGD("=== Disable trigger mode");///禁用触发模式
-    ASSERT_OK( TYSetBool(hDevice, TY_COMPONENT_DEVICE, TY_BOOL_TRIGGER_MODE, false) );
+    LOGD("=== Disable trigger mode"); ///禁用触发模式
+    ASSERT_OK(
+        TYSetBool(hDevice, TY_COMPONENT_DEVICE, TY_BOOL_TRIGGER_MODE, false));
 
-    LOGD("=== Start capture");///开始捕获
-    ASSERT_OK( TYStartCapture(hDevice) );
+    LOGD("=== Start capture"); ///开始捕获
+    ASSERT_OK(TYStartCapture(hDevice));
 
-    LOGD("=== Read color rectify matrix");///读取彩色矫正矩阵
+    LOGD("=== Read color rectify matrix"); ///读取彩色矫正矩阵
     {
         TY_CAMERA_DISTORTION color_dist;
         TY_CAMERA_INTRINSIC color_intri;
-        TY_STATUS ret = TYGetStruct(hDevice, TY_COMPONENT_RGB_CAM, TY_STRUCT_CAM_DISTORTION, &color_dist, sizeof(color_dist));
-        ret |= TYGetStruct(hDevice, TY_COMPONENT_RGB_CAM, TY_STRUCT_CAM_INTRINSIC, &color_intri, sizeof(color_intri));
-        if (ret == TY_STATUS_OK)
-        {
+        TY_STATUS ret =
+            TYGetStruct(hDevice, TY_COMPONENT_RGB_CAM, TY_STRUCT_CAM_DISTORTION,
+                        &color_dist, sizeof(color_dist));
+        ret |= TYGetStruct(hDevice, TY_COMPONENT_RGB_CAM, TY_STRUCT_CAM_INTRINSIC,
+                           &color_intri, sizeof(color_intri));
+        if (ret == TY_STATUS_OK) {
             cb_data.color_intri = color_intri;
-            cb_data.color_dist= color_dist;
-        }
-        else
-        { //reading data from device failed .set some default values....
+            cb_data.color_dist = color_dist;
+        } else { // reading data from device failed .set some default values....
             memset(cb_data.color_dist.data, 0, 12 * sizeof(float));
             memset(cb_data.color_intri.data, 0, 9 * sizeof(float));
             cb_data.color_intri.data[0] = 1000.f;
@@ -428,26 +430,24 @@ int main(int argc, char* argv[])
     exit_main = false;
     gpio_init();
     can_init();
-    //pre work
-    param();                         ////从文件中读取各种参数////
-    getRt();                         ///从RT文件中读取RT矩阵////
-    quantized();                     ////把folat型转化为int型，提高算法的速度////
+    // pre work
+    param();     ////从文件中读取各种参数////
+    getRt();     ///从RT文件中读取RT矩阵////
+    quantized(); ////把folat型转化为int型，提高算法的速度////
     cout << "llsu1" << endl;
 
     control contr1;
 
-    thread tc(while_control,ref(contr1));///单独踢出一个线程用来做CAN接受
+    thread tc(while_control, ref(contr1)); ///单独踢出一个线程用来做CAN接受
     tc.detach();
 
     thread tt(while_key);
-    tt.detach();                   ///单独踢出一个线程用来做按键检测
+    tt.detach(); ///单独踢出一个线程用来做按键检测
 
-    QApplication a(argc,argv);
-    MainWindow w;                  ///QT界面开发
+    QApplication a(argc, argv);
+    MainWindow w; /// QT界面开发
 
-
-
-    while(!exit_main) {
+    while (!exit_main) {
         clock_t while_start = clock();
         TY_FRAME_DATA frame;
         cout << "llsu2" << endl;
@@ -460,19 +460,21 @@ int main(int argc, char* argv[])
             handleFrame(&frame, &cb_data, w, contr1);
             clock_t get_frame_end = clock();
 
-            cout << "get_frame_time=" << (get_frame_end - get_frame_start) / 1000 << "ms" << endl;
+            cout << "get_frame_time=" << (get_frame_end - get_frame_start) / 1000
+                 << "ms" << endl;
         }
         clock_t while_end = clock();
         cout << "while_time=" << (while_end - while_start) / 1000 << "ms" << endl;
     }
-    key_ =false;
+    key_ = false;
     can_closed();
-    ASSERT_OK( TYStopCapture(hDevice) );
-    ASSERT_OK( TYCloseDevice(hDevice) );
-    ASSERT_OK( TYDeinitLib() );
+    ASSERT_OK(TYStopCapture(hDevice));
+    ASSERT_OK(TYCloseDevice(hDevice));
+    ASSERT_OK(TYDeinitLib());
     delete frameBuffer[0];
     delete frameBuffer[1];
 
     LOGD("=== Main done!");
+
     return 0;
 }

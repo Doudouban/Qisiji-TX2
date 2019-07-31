@@ -1,0 +1,773 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BuildServerSettings">
+    <option name="LOGIN" value="" />
+    <option name="SERVER_URL" value="http://buildserver" />
+    <option name="REMEMBER_ME" value="true" />
+    <option name="USE_IDEA_PROXY_SETTINGS" value="true" />
+    <option name="INSPECTIONS_BUILD_TYPE_IDS" />
+    <option name="DUPLICATES_BUILD_TYPE_IDS" />
+    <option name="COVERAGE_SETTINGS" />
+    <option name="TEST_STATUS_ENABLED" value="true" />
+    <option name="TEST_STATUS_SHOW_SUCCESSFUL" value="false" />
+    <option name="POSTPONE_SUITABLE_CONFIGURATIONS_SEARCH" value="false" />
+    <option name="ARTIFACTS_BUILD_TYPE_IDS" />
+    <option name="PERFORM_COMMIT_IF_SUCCESSFUL" value="true" />
+    <option name="PERFORM_COMMIT_IF_NO_NEW_FAILED_TESTS" value="false" />
+    <option name="REQUEST_CONFIRMATON" value="false" />
+    <option name="PRE_TESTED_COMMIT" value="true" />
+    <option name="FILTER_BY_STATUS" value="false" />
+    <option name="FILTER_MARKED_AS_FIXED" value="false" />
+    <option name="SHOW_CLOSE_PROMPT" value="true" />
+    <option name="TOOL_WINDOW_SELECTED_CONTENT_INDEX" value="0" />
+    <option name="FILTER_BY_CURRENT_PROJECT" value="true" />
+    <treeState key="project">
+      <selectedPath>
+        <pathElement>
+          <option name="myNodeId" value="helperText" />
+          <option name="myNodeType" value="jetbrains.buildServer.tree.descriptors.LinkedTextDescriptor" />
+        </pathElement>
+      </selectedPath>
+    </treeState>
+  </component>
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated>
+      <config projectName="box_runtime_vertion" targetName="box_runtime_vertion" />
+      <config projectName="box_runtime_vertion" targetName="box_runtime_vertion_autogen" />
+    </generated>
+  </component>
+  <component name="CMakeSettings" AUTO_RELOAD="true">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="03d87bbf-df45-4dc2-ba8d-3bee469d7bcd" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/chao.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/can_jetson.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/can_jetson.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/ddban.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/ddban.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/jetsonGPIO.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/jetsonGPIO.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/key_jetson.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/key_jetson.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/mainwindow.ui" beforeDir="false" afterPath="$PROJECT_DIR$/include/mainwindow.ui" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/ui_mainwindow.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/ui_mainwindow.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/can_jetson.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/can_jetson.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ddban.cpp.autosave" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/jetsonGPIO.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/jetsonGPIO.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/key_jetson.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/key_jetson.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/mainwindow.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/mainwindow.cpp" afterDir="false" />
+    </list>
+    <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="DefaultGradleProjectSettings">
+    <option name="testRunner" value="GRADLE" />
+    <option name="delegatedBuild" value="true" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="678">
+              <caret line="90" column="48" selection-start-line="90" selection-start-column="48" selection-end-line="90" selection-end-column="48" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/key_jetson.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="40">
+              <caret line="2" lean-forward="true" selection-start-line="2" selection-end-line="2" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>box_world</find>
+      <find>intrinsic</find>
+      <find>fallPoints_2D</find>
+      <find>num</find>
+      <find>flag</find>
+      <find>range_low</find>
+      <find>fallPoints_world</find>
+      <find>color_type</find>
+      <find>pData</find>
+      <find>cloud_3f</find>
+      <find>corners_pixel</find>
+      <find>resizedColor</find>
+      <find>join</find>
+      <find>canX</find>
+      <find>height_of_basket</find>
+      <find>can_bitrate</find>
+      <find>fallPoints_pixel_color</find>
+      <find>p3d</find>
+      <find>index</find>
+      <find>get_height</find>
+      <find>can_id</find>
+      <find>id</find>
+      <find>frame</find>
+      <find>key_detection</find>
+      <find>key_</find>
+      <find>397</find>
+      <find>led</find>
+      <find>398</find>
+      <find>key_hegih</find>
+      <find>height</find>
+    </findStrings>
+    <replaceStrings>
+      <replace>298</replace>
+      <replace>key_height</replace>
+    </replaceStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/include/TY_API.h" />
+        <option value="$PROJECT_DIR$/common/common.hpp" />
+        <option value="$PROJECT_DIR$/common/prama.hpp" />
+        <option value="$PROJECT_DIR$/include/ddban.cpp" />
+        <option value="$PROJECT_DIR$/main.cpp" />
+        <option value="$PROJECT_DIR$/include/llsu.cpp" />
+        <option value="$PROJECT_DIR$/src/PointCloudViewer.cpp" />
+        <option value="$PROJECT_DIR$/include/prama.hpp" />
+        <option value="$PROJECT_DIR$/src/kmeans.cpp" />
+        <option value="$PROJECT_DIR$/include/kmeans.h" />
+        <option value="$PROJECT_DIR$/include/point.h" />
+        <option value="$PROJECT_DIR$/src/point.cpp" />
+        <option value="$PROJECT_DIR$/readme.txt" />
+        <option value="$PROJECT_DIR$/include/DepthRender.hpp" />
+        <option value="$PROJECT_DIR$/Rt.txt" />
+        <option value="$PROJECT_DIR$/param.txt" />
+        <option value="$PROJECT_DIR$/include/llsu.hpp" />
+        <option value="$PROJECT_DIR$/src/llsu.cpp" />
+        <option value="$PROJECT_DIR$/include/mainwindow.h" />
+        <option value="$PROJECT_DIR$/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/src/ddban.cpp" />
+        <option value="$PROJECT_DIR$/include/jetsonGPIO.hpp" />
+        <option value="$PROJECT_DIR$/include/can_jetson.hpp" />
+        <option value="$PROJECT_DIR$/include/key_jetson.hpp" />
+        <option value="$PROJECT_DIR$/src/can_jetson.cpp" />
+        <option value="$PROJECT_DIR$/src/jetsonGPIO.cpp" />
+        <option value="$PROJECT_DIR$/src/mainwindow.cpp" />
+        <option value="$PROJECT_DIR$/include/ddban.h" />
+        <option value="$PROJECT_DIR$/.editorconfig" />
+        <option value="$PROJECT_DIR$/src/main.cpp" />
+        <option value="$PROJECT_DIR$/src/key_jetson.cpp" />
+      </list>
+    </option>
+  </component>
+  <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="92" />
+    <option name="y" value="24" />
+    <option name="width" value="1279" />
+    <option name="height" value="668" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="box_runtime_vertion" type="b2602c69:ProjectViewProjectNode" />
+              <item name="box_runtime_version" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="box_runtime_vertion" type="b2602c69:ProjectViewProjectNode" />
+              <item name="box_runtime_version" type="462c0819:PsiDirectoryNode" />
+              <item name="include" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="box_runtime_vertion" type="b2602c69:ProjectViewProjectNode" />
+              <item name="box_runtime_version" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="cf.advertisement.text.overridden" value="true" />
+    <property name="editor.config.ad.shown" value="true" />
+    <property name="ignore_missing_gitignore" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.stylelint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.stylelint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.stylelint" value="" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="settings.editor.selected.configurable" value="preferences.sourceCode.C/C++" />
+    <property name="two.files.diff.last.used.file" value="/media/chao/Fat32/007/box_runtime_version_TX1 -3/box_runtime_version/src/main.cpp" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/include" />
+    </key>
+  </component>
+  <component name="RemoteSynchronizer">
+    <option name="targetMappings">
+      <list>
+        <TargetMappings>
+          <option name="name" value="Default" />
+        </TargetMappings>
+      </list>
+    </option>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration name="Build All" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="box_runtime_vertion" RUN_TARGET_NAME="box_runtime_vertion" EXPLICIT_BUILD_TARGET_NAME="all">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="03d87bbf-df45-4dc2-ba8d-3bee469d7bcd" name="Default" comment="" />
+      <created>1531567589268</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1531567589268</updated>
+      <workItem from="1531567590745" duration="28000" />
+      <workItem from="1531567637042" duration="37129000" />
+      <workItem from="1531703939347" duration="6390000" />
+      <workItem from="1531716674161" duration="8480000" />
+      <workItem from="1531735700780" duration="1236000" />
+      <workItem from="1531743016745" duration="989000" />
+      <workItem from="1531744128521" duration="10000" />
+      <workItem from="1531751602568" duration="2600000" />
+      <workItem from="1531802172908" duration="162000" />
+      <workItem from="1531802524073" duration="2525000" />
+      <workItem from="1531830545566" duration="1336000" />
+      <workItem from="1531874209219" duration="988000" />
+      <workItem from="1531878649231" duration="1110000" />
+      <workItem from="1531891311946" duration="152000" />
+      <workItem from="1538628903449" duration="12911000" />
+      <workItem from="1538717712155" duration="13621000" />
+      <workItem from="1539221633050" duration="22721000" />
+      <workItem from="1540777566112" duration="14346000" />
+      <workItem from="1541041344238" duration="20603000" />
+      <workItem from="1541246109928" duration="28123000" />
+      <workItem from="1541597485740" duration="1198000" />
+      <workItem from="1541642957964" duration="18000" />
+      <workItem from="1541644243513" duration="13629000" />
+      <workItem from="1541680037264" duration="26850000" />
+      <workItem from="1541940578649" duration="21659000" />
+      <workItem from="1542074068176" duration="10245000" />
+      <workItem from="1542117490530" duration="15868000" />
+      <workItem from="1542692435925" duration="2808000" />
+      <workItem from="1542697655711" duration="28473000" />
+      <workItem from="1543388383533" duration="7418000" />
+      <workItem from="1544101455508" duration="5383000" />
+      <workItem from="1544278967639" duration="2398000" />
+      <workItem from="1544496625113" duration="5583000" />
+      <workItem from="1544935765932" duration="597000" />
+      <workItem from="1545116553354" duration="1365000" />
+      <workItem from="1545138807288" duration="5791000" />
+      <workItem from="1545615601634" duration="1348000" />
+      <workItem from="1545726146677" duration="353000" />
+      <workItem from="1551077742180" duration="4360000" />
+      <workItem from="1551598013379" duration="2390000" />
+      <workItem from="1551727896429" duration="593000" />
+      <workItem from="1551783729352" duration="49000" />
+      <workItem from="1551786514430" duration="3740000" />
+      <workItem from="1551795028859" duration="10622000" />
+      <workItem from="1551927554558" duration="1535000" />
+      <workItem from="1552010495551" duration="4823000" />
+      <workItem from="1552228971384" duration="3565000" />
+      <workItem from="1552619945592" duration="764000" />
+      <workItem from="1552804836180" duration="1007000" />
+      <workItem from="1553060665780" duration="3411000" />
+      <workItem from="1553173978936" duration="4960000" />
+      <workItem from="1553602423742" duration="3764000" />
+      <workItem from="1554684573080" duration="425000" />
+      <workItem from="1554686408419" duration="6814000" />
+      <workItem from="1554789873415" duration="2077000" />
+      <workItem from="1554876761195" duration="12668000" />
+      <workItem from="1554956815305" duration="12450000" />
+      <workItem from="1555044393062" duration="5528000" />
+      <workItem from="1555306254977" duration="6921000" />
+      <workItem from="1555391189838" duration="29240000" />
+      <workItem from="1555649692112" duration="1354000" />
+      <workItem from="1555844205322" duration="2577000" />
+      <workItem from="1555895270344" duration="4985000" />
+      <workItem from="1556191463451" duration="611000" />
+      <workItem from="1556376746616" duration="154000" />
+      <workItem from="1556421979815" duration="331000" />
+      <workItem from="1556430742067" duration="1117000" />
+      <workItem from="1556441486187" duration="290000" />
+      <workItem from="1556441871258" duration="1692000" />
+      <workItem from="1556535388590" duration="283000" />
+      <workItem from="1557041348488" duration="7982000" />
+      <workItem from="1557137558241" duration="2466000" />
+      <workItem from="1557140317599" duration="1869000" />
+      <workItem from="1557387849909" duration="2269000" />
+      <workItem from="1557462988696" duration="3881000" />
+      <workItem from="1557487166788" duration="4745000" />
+      <workItem from="1557731573566" duration="6885000" />
+      <workItem from="1557753495069" duration="2358000" />
+      <workItem from="1557810077789" duration="6023000" />
+      <workItem from="1557824614888" duration="720000" />
+      <workItem from="1557826200277" duration="839000" />
+      <workItem from="1557828407007" duration="982000" />
+      <workItem from="1557921305718" duration="6240000" />
+      <workItem from="1558059443636" duration="746000" />
+      <workItem from="1558406730491" duration="370000" />
+      <workItem from="1559357052150" duration="822000" />
+      <workItem from="1559901147898" duration="1754000" />
+      <workItem from="1560255627861" duration="9762000" />
+      <workItem from="1560845955130" duration="594000" />
+      <workItem from="1561701804657" duration="26844000" />
+      <workItem from="1562152900884" duration="3306000" />
+      <workItem from="1562156340496" duration="26174000" />
+      <workItem from="1562662098079" duration="6423000" />
+      <workItem from="1562670815069" duration="6887000" />
+      <workItem from="1563615056338" duration="11981000" />
+      <workItem from="1563708533126" duration="608000" />
+      <workItem from="1563715102393" duration="1242000" />
+      <workItem from="1563786739596" duration="74000" />
+      <workItem from="1563855632549" duration="1875000" />
+      <workItem from="1563857530558" duration="5124000" />
+      <workItem from="1563862695236" duration="4067000" />
+      <workItem from="1563866843372" duration="322000" />
+      <workItem from="1563869821469" duration="217000" />
+      <workItem from="1563870060274" duration="847000" />
+      <workItem from="1563948032681" duration="288000" />
+      <workItem from="1563955612628" duration="294000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="619424000" />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="0" y="0" width="1366" height="768" extended-state="6" />
+    <layout>
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.20091324" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.2739726" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.1746862" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.2168926" />
+      <window_info active="true" anchor="bottom" id="Messages" order="7" visible="true" weight="0.33904108" />
+      <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.4975097" weight="0.13256785" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50076103" side_tool="true" weight="0.30993152" />
+      <window_info anchor="bottom" id="Version Control" order="10" />
+      <window_info anchor="bottom" id="CMake" order="11" weight="0.17118998" />
+      <window_info anchor="bottom" id="Database Changes" order="12" show_stripe_button="false" />
+      <window_info anchor="bottom" id="RemoteSynchronizer" order="13" sideWeight="0.49923897" weight="0.30993152" />
+      <window_info anchor="bottom" id="Docker" order="14" show_stripe_button="false" />
+      <window_info anchor="bottom" id="TeamCity" order="15" sideWeight="0.49923897" weight="0.29965752" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Database" order="3" />
+    </layout>
+    <layout-to-restore>
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17712471" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.19689922" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.1746862" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.2168926" />
+      <window_info anchor="bottom" id="Messages" order="7" weight="0.32868218" />
+      <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.4975097" weight="0.1843318" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50249034" side_tool="true" weight="0.19874477" />
+      <window_info anchor="bottom" id="Version Control" order="10" />
+      <window_info anchor="bottom" id="CMake" order="11" weight="0.21658987" />
+      <window_info anchor="bottom" id="Database Changes" order="12" show_stripe_button="false" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Database" order="3" />
+    </layout-to-restore>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/.." />
+    </ignored-roots>
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/main.cpp" />
+    <entry file="file://$PROJECT_DIR$/include/prama.hpp" />
+    <entry file="file://$PROJECT_DIR$/result/kmeans.h" />
+    <entry file="file://$PROJECT_DIR$/src/kmeans.h" />
+    <entry file="file://$PROJECT_DIR$/src/points.cpp" />
+    <entry file="file://$PROJECT_DIR$/include/point.h" />
+    <entry file="file://$PROJECT_DIR$/src/point.cpp" />
+    <entry file="file://$PROJECT_DIR$/src/kmeans.cpp" />
+    <entry file="file://$PROJECT_DIR$/include/kmeans.h" />
+    <entry file="file://$PROJECT_DIR$/include/PointCloudViewer.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="133">
+          <caret line="7" selection-start-line="7" selection-end-line="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/PointCloudViewer.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1805">
+          <caret line="95" column="72" selection-start-line="95" selection-start-column="72" selection-end-line="95" selection-end-column="72" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/TY_API.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="8436">
+          <caret line="444" column="56" selection-start-line="444" selection-start-column="51" selection-end-line="444" selection-end-column="56" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/Utils.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1691">
+          <caret line="89" column="30" selection-start-line="89" selection-start-column="22" selection-end-line="89" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/common.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="54">
+          <caret line="3" column="10" selection-start-line="3" selection-start-column="10" selection-end-line="3" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MatViewer.cpp">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/readme.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="22" selection-start-column="22" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/DepthRender.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="988">
+          <caret line="52" column="12" selection-start-line="52" selection-start-column="12" selection-end-line="52" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Rt.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="96">
+          <caret line="4" column="31" selection-start-line="4" selection-start-column="31" selection-end-line="4" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ui_mainwindow.h" />
+    <entry file="file://$PROJECT_DIR$/param.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="432">
+          <caret line="18" selection-start-line="18" selection-end-line="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/5/thread" />
+    <entry file="file://$USER_HOME$/Qt5.12.0/5.12.0/gcc_64/include/QtGui/qopengles2ext.h" />
+    <entry file="file://$PROJECT_DIR$/src/llsu.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4485">
+          <caret line="299" column="9" selection-start-line="299" selection-start-column="9" selection-end-line="299" selection-end-column="9" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/x86_64-linux-gnu/bits/unistd.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="208">
+          <caret line="33" selection-start-line="33" selection-end-line="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/linux/socket.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="23" selection-start-line="10" selection-start-column="23" selection-end-line="10" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/x86_64-linux-gnu/sys/socket.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="208">
+          <caret line="225" column="11" selection-start-line="225" selection-start-column="11" selection-end-line="225" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/string.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="208">
+          <caret line="61" column="13" selection-start-line="61" selection-start-column="13" selection-end-line="61" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/x86_64-linux-gnu/bits/string3.h" />
+    <entry file="file:///usr/include/unistd.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="208">
+          <caret line="368" column="15" selection-start-line="368" selection-start-column="15" selection-end-line="368" selection-end-column="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/linux/can.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="191">
+          <caret line="85" column="8" selection-start-line="85" selection-start-column="8" selection-end-line="85" selection-end-column="8" />
+          <folding>
+            <element signature="e#2249#2273#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/x86_64-linux-gnu/bits/socket.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="191">
+          <caret line="72" column="20" lean-forward="true" selection-start-line="72" selection-start-column="20" selection-end-line="72" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/net/if.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="191">
+          <caret line="162" column="40" selection-start-line="162" selection-start-column="40" selection-end-line="162" selection-end-column="43" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/x86_64-linux-gnu/bits/ioctls.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="208">
+          <caret line="58" column="8" selection-start-line="58" selection-start-column="8" selection-end-line="58" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/linux/can/raw.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="348">
+          <caret line="54" column="4" selection-start-line="54" selection-start-column="4" selection-end-line="54" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/llsu.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1416">
+          <caret line="71" selection-start-line="71" selection-end-line="71" />
+          <folding>
+            <element signature="e#30#62#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="403">
+          <caret line="29" column="72" selection-start-line="29" selection-start-column="72" selection-end-line="29" selection-end-column="72" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/can_jetson.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="235">
+          <caret line="99" column="40" selection-start-line="99" selection-start-column="40" selection-end-line="99" selection-end-column="40" />
+          <folding>
+            <element signature="e#0#48#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/jetsonGPIO.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="137">
+          <caret line="44" column="32" selection-start-line="44" selection-start-column="32" selection-end-line="44" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/mainwindow.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1213">
+          <caret line="73" column="29" selection-start-line="73" selection-start-column="29" selection-end-line="73" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/can_jetson.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="140">
+          <caret line="7" lean-forward="true" selection-start-line="7" selection-end-line="7" />
+          <folding>
+            <element signature="e#141#223#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/jetsonGPIO.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="164">
+          <caret line="97" lean-forward="true" selection-start-line="97" selection-end-line="97" />
+          <folding>
+            <element signature="e#2297#2316#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/5/array">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-340">
+          <caret line="89" column="5" selection-start-line="89" selection-start-column="5" selection-end-line="89" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/mainwindow.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="196">
+          <caret line="55" column="2" lean-forward="true" selection-start-line="55" selection-start-column="2" selection-end-line="55" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlabel.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="118">
+          <caret line="52" column="23" selection-start-line="52" selection-start-column="23" selection-end-line="52" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/ui_mainwindow.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="88">
+          <caret line="32" column="12" lean-forward="true" selection-start-line="32" selection-start-column="12" selection-end-line="32" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ddban.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2344">
+          <caret line="12" column="22" lean-forward="true" selection-start-line="12" selection-start-column="22" selection-end-line="12" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/ddban.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="164">
+          <caret line="25" column="16" lean-forward="true" selection-start-line="25" selection-start-column="16" selection-end-line="25" selection-end-column="16" />
+          <folding>
+            <element signature="e#0#2#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.editorconfig">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/key_jetson.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-4">
+          <caret line="7" column="34" selection-start-line="7" selection-start-column="34" selection-end-line="7" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="678">
+          <caret line="90" column="48" selection-start-line="90" selection-start-column="48" selection-end-line="90" selection-end-column="48" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/key_jetson.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="40">
+          <caret line="2" lean-forward="true" selection-start-line="2" selection-end-line="2" />
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ScopeChooserConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
+  </component>
+</project>

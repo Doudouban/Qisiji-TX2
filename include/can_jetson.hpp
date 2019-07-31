@@ -3,10 +3,11 @@
 #ifndef CAN_CODE_CAN_BUS_JETSON_HPP
 #define CAN_CODE_CAN_BUS_JETSON_HPP
 
-#include <array>
 #include "key_jetson.hpp"
+#include <array>
 
 using namespace std;
+
 /*class can_jetson{
 public:
     int can_init();
@@ -27,9 +28,8 @@ enum canX {
 
 int can_init();
 int can_closed();
-void can_send(const int& can_id, const int& can_dlc, const array<int,8>& a);
-void can_receive(int& id, array<int,8>& a);
-// temp
+void can_send(const int &can_id, const int &can_dlc, const array<int, 8> &a);
+void can_receive(int &id, array<int, 8> &a);
 
 #endif // CAN_CODE_CAN_BUS_JETSON_HPP
 

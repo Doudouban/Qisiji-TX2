@@ -6,7 +6,7 @@
 
 extern bool key_detection;
 
-void control::traversal_control(vector<Point3f>& fallpoint_world,const int height_of_basket, const int symbol_step, MainWindow &w) {
+void control::traversal_control(vector<Point3f>& fallpoint_world,const int height_of_basket, const int symbol_step, MainWindow &w) {///hengxiang
     CAN_id=0x18efff4f;
     CAN_data[0]=0;//保留
     CAN_data[1]=0;//保留
@@ -23,19 +23,27 @@ void control::traversal_control(vector<Point3f>& fallpoint_world,const int heigh
     }
     for(int i=0;i<fallpoint_world.size();i++){
      cout<<fallpoint_world[i]<<endl;
-}
+    }
+    cout<<fallpoint_world.size()<<endl;
+    if(fallpoint_world[0].x<10){
+        CAN_data[3]=10;
+        CAN_data[4]=0;
+        CAN_data[6]=0x50;
+        w.direction = 2;
+    }
+    else {
 
     bool left_= false;
     bool right_= false;
     for (int i = 0; i <fallpoint_world.size(); ++i) {
         if (fallpoint_world[i].z > height_of_basket+symbol_step) {
             i++;
-            if(i>fallpoint_world.size())
+            if(i>fallpoint_world.size()-1)
                 break;
         }
         if (fallpoint_world[i].z < height_of_basket+symbol_step) {
             cout<<"i="<<i<<endl;
-            if ((fallpoint_world[i].x <= 50) && (fallpoint_world[i].x >= -50)) {
+            if ((fallpoint_world[i].x <= 150) && (fallpoint_world[i].x >= 50)) {
                 right_ = false;
                 CAN_data[2]=0;//转动速度
                 CAN_data[3]=0;//a[5],[6]表示转动角度
@@ -46,11 +54,11 @@ void control::traversal_control(vector<Point3f>& fallpoint_world,const int heigh
                 cout<<"000000000000"<<endl;
                 break;
             }
-            else if(fallpoint_world[i].x > 50) {
+            else if(fallpoint_world[i].x > 150) {
 
 
 
-                if (fallpoint_world[i].x < 80) {
+                if (fallpoint_world[i].x < 180) {
                     left_ = true;
                     right_ = false;///转动速度为20,转动角度10,右转
                     CAN_data[2]=20;
@@ -62,7 +70,7 @@ void control::traversal_control(vector<Point3f>& fallpoint_world,const int heigh
                     break;
 
                 }
-                else if(fallpoint_world[i].x<120){
+                else if(fallpoint_world[i].x<220){
                     left_ = true;
                     right_ = false;///转动速度为30,转动角度20,右转
                     CAN_data[2]=30;
@@ -87,11 +95,11 @@ void control::traversal_control(vector<Point3f>& fallpoint_world,const int heigh
                 }
 
             }
-            else if (fallpoint_world[i].x < -50) {
+            else if (fallpoint_world[i].x < 50) {
 
 
 
-                if(fallpoint_world[i].x>-80){
+                if(fallpoint_world[i].x>20){
                     left_ = false;
                     right_ =true;
                     CAN_data[2]=20;
@@ -102,7 +110,7 @@ void control::traversal_control(vector<Point3f>& fallpoint_world,const int heigh
                     cout<<"44444444444"<<endl;
                     break;
                 }
-                else if(fallpoint_world[i].x>-240){
+                else if(fallpoint_world[i].x>-140){
                     left_ = false;
                     right_ =true;
                     CAN_data[2]=30;
@@ -132,6 +140,8 @@ void control::traversal_control(vector<Point3f>& fallpoint_world,const int heigh
         }
 
     }
+    }
+    cout<<"33333333333333333333333333333333333333333333333333333333333333"<<endl;
     can_send(CAN_id,CAN_dlc,CAN_data);
 }
 void control::vertical_control(vector<Point2f>& fallPoints_2D )  //喷头角度与落点的关系
