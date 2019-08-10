@@ -6,12 +6,16 @@
 
 extern bool key_detection;
 
-void control::traversal_control(vector<Point3f>& fallpoint_world,const int height_of_basket, const int symbol_step, MainWindow &w) {///hengxiang
+void control::traversal_control(vector<Point3f>& fallpoint_world,int height_of_basket, const int& symbol_step, MainWindow &w, const int& fall_step) {
+    ///横向
     CAN_id=0x18efff4f;
-    CAN_data[0]=0;//保留
-    CAN_data[1]=0;//保留
-    CAN_data[5]=0;//保留
-    CAN_data[7]=0x10;
+    CAN_data[0] = 0x00;
+    CAN_data[2] = 0x00;
+    CAN_data[3] = 0x00;
+    CAN_data[4] = 0x00;
+    CAN_data[5] = 0x00;
+    CAN_data[6] = 0x07;
+    CAN_data[7] = 0xF1;
     for (int i = 0; i < fallpoint_world.size(); i++) {
         for (int j = fallpoint_world.size() - 1; j > i; j--) {
             if (fallpoint_world[i].x < fallpoint_world[j].x) {
@@ -21,59 +25,51 @@ void control::traversal_control(vector<Point3f>& fallpoint_world,const int heigh
             }
         }
     }
-    for(int i=0;i<fallpoint_world.size();i++){
-     cout<<fallpoint_world[i]<<endl;
+    //shuchuluodian
+//    for(int i=0;i<fallpoint_world.size();i++){
+//     cout<<fallpoint_world[i]<<endl;
+//    }
+//    cout<<fallpoint_world.size()<<endl;
+    if(fallpoint_world.size()==0){
+        ifstream filename;
+        filename.open("../high.txt");
+        filename>>height_of_basket;
+        filename.close();
+        CAN_data[1]=0x00; //stop
+        w.direction = 0;
     }
-    cout<<fallpoint_world.size()<<endl;
-    if(fallpoint_world[0].x<10){
-        CAN_data[3]=10;
-        CAN_data[4]=0;
-        CAN_data[6]=0x50;
+    else if(fallpoint_world[0].x<fall_step){
+        CAN_data[1]=0x01; //turn left slowly
         w.direction = 2;
     }
     else {
-
-    bool left_= false;
-    bool right_= false;
-    for (int i = 0; i <fallpoint_world.size(); ++i) {
-        if (fallpoint_world[i].z > height_of_basket+symbol_step) {
-            i++;
-            if(i>fallpoint_world.size()-1)
-                break;
-        }
-        if (fallpoint_world[i].z < height_of_basket+symbol_step) {
+        for (int i = 0; i <fallpoint_world.size(); ++i) {
+            if (fallpoint_world[i].z > height_of_basket) {
+                i++;
+                if(i>fallpoint_world.size()-1)
+                    break;
+            }
+        if ((fallpoint_world[i].z <= height_of_basket+symbol_step/2)&&(i!=0)) {
             cout<<"i="<<i<<endl;
-            if ((fallpoint_world[i].x <= 150) && (fallpoint_world[i].x >= 50)) {
-                right_ = false;
-                CAN_data[2]=0;//转动速度
-                CAN_data[3]=0;//a[5],[6]表示转动角度
-                CAN_data[4]=0;
-                CAN_data[6]=0;//转动方向：右：0x50,左：0x05
-                left_ = false;
+            if ((fallpoint_world[i].x <= (fall_step/2)) && (fallpoint_world[i].x >= -(fall_step/2))) {
+                CAN_data[1]=0x00; //stop?? f1 07 00 00 00 00 00 00
                 w.direction = 0;
+                count_l=0;
+                count_r=0;
                 cout<<"000000000000"<<endl;
                 break;
             }
-            else if(fallpoint_world[i].x > 150) {
-
-
-
-                if (fallpoint_world[i].x < 180) {
-                    left_ = true;
-                    right_ = false;///转动速度为20,转动角度10,右转
-                    CAN_data[2]=20;
-                    CAN_data[3]=10;
-                    CAN_data[4]=0;
-                    CAN_data[6]=0x50;
+            else if((fallpoint_world[i].x) > (fall_step/2) && (++count_r >2)) {
+                count_l = 0;
+                if (fallpoint_world[i].x < 3*(fall_step/2)) {
+                    CAN_data[1]=0x10;//turn right slowly
                     cout<<"1111111111"<<endl;
                     w.direction = 1;
                     break;
 
                 }
-                else if(fallpoint_world[i].x<220){
-                    left_ = true;
-                    right_ = false;///转动速度为30,转动角度20,右转
-                    CAN_data[2]=30;
+/*                else if(fallpoint_world[i].x<5*(fall_step/2)){
+                    CAN_data[2]=30;///转动速度为30,转动角度20,右转
                     CAN_data[3]=20;
                     CAN_data[4]=0;
                     CAN_data[6]=0x50;
@@ -81,111 +77,151 @@ void control::traversal_control(vector<Point3f>& fallpoint_world,const int heigh
                     cout<<"222222222"<<endl;
                     break;
 
-                } else{
-                    left_ = true;
-                    right_ = false;///转动速度为40,转动角度40,右转
-                    CAN_data[2]=40;
-                    CAN_data[3]=40;
-                    CAN_data[4]=0;
-                    CAN_data[5]=0x50;
+                } */else{
+                    CAN_data[1]=0x50;//turn right fast
                     w.direction = 1;
                     cout<<"333333333"<<endl;
                     break;
-
                 }
 
             }
-            else if (fallpoint_world[i].x < 50) {
-
-
-
+            else if ((fallpoint_world[i].x) < -(fall_step/2) && (++count_l >2)) {
+                count_r = 0;
                 if(fallpoint_world[i].x>20){
-                    left_ = false;
-                    right_ =true;
-                    CAN_data[2]=20;
-                    CAN_data[3]=10;
-                    CAN_data[4]=0;
-                    CAN_data[6]=0x05;
+                    CAN_data[1]=0x01;//turn left slowly
                     w.direction = 2;
                     cout<<"44444444444"<<endl;
                     break;
                 }
-                else if(fallpoint_world[i].x>-140){
-                    left_ = false;
-                    right_ =true;
-                    CAN_data[2]=30;
-                    CAN_data[3]=30;
-                    CAN_data[4]=0;
-                    CAN_data[6]=0x05;
-                    w.direction = 2;
-                    cout<<"5555555555"<<endl;
-                    break;
-                }
+//                else if(fallpoint_world[i].x>-3*(fall_step/2)){
+//                    CAN_data[2]=30;
+//                    CAN_data[3]=30;
+//                    CAN_data[4]=0;
+//                    CAN_data[6]=0x05;
+//                    w.direction = 2;
+//                    cout<<"5555555555"<<endl;
+//                    break;
+//                }
                 else{
-                    left_ = false;
-                    right_ =true;
-                    CAN_data[2]=40;
-                    CAN_data[3]-=40;
-                    CAN_data[4]=0;
-                    CAN_data[6]=0x05;
+                    CAN_data[1]=0x05;//turn left fast
                     w.direction = 2;
                     cout<<"66666666666"<<endl;
                     break;
                 }
 
             }
-            cout << "right=" << right_ << endl;
-            cout << "left=" << left_ << endl;
             break;
         }
 
     }
     }
-    cout<<"33333333333333333333333333333333333333333333333333333333333333"<<endl;
     can_send(CAN_id,CAN_dlc,CAN_data);
 }
-void control::vertical_control(vector<Point2f>& fallPoints_2D )  //喷头角度与落点的关系
+void control::vertical_control(const vector<Point2f>& fallPoints_2D )  //喷头角度与落点的关系
 {
-
-/*    CAN_id=0x18eeff4f;///挡料板控制ID
-    CAN_data[0]=0;//保留
-    CAN_data[1]=0;//保留
-    CAN_data[4]=0;//保留
-    CAN_data[7]=0x10;*/
+    cout<<"zongxiangkongzhi_start--------------------"<<endl;
+    CAN_id=0x18efff4f;///挡料板控制ID
+    CAN_data[0] = 0x00;
+    CAN_data[1] = 0x00;
+    CAN_data[3] = 0x00;
+    CAN_data[4] = 0x00;
+    CAN_data[5] = 0x00;
+    CAN_data[6] = 0x07;
+    CAN_data[7] = 0xF1;
     double a,b,c,temp,mid;
     double s,h;
-    //double trailer_h;
     double right_fallpoint_d;
     double angle_c; ///结算出挡板与水平线的夹角
-    //trailer_h=height_of_basket; //车筐的高度
-    right_fallpoint_d=(fallPoints_2D[1].y+fallPoints_2D[0].y);
+    for(int i=0;i<fallPoints_2D.size();i++){
+        if(fallPoints_2D[i].x==50){
+            right_fallpoint_d=fallPoints_2D[i].y;
+            break;
 
+        }
+    }
+    right_fallpoint_d/=1000;
+    cout<<right_fallpoint_d<<endl;
     s=right_fallpoint_d-arm_r*cos(angle_b*Pi/180);
     h=arm_r*sin(angle_b*Pi/180);
     a=(g1*s*s)/(2*v*v);///a>0
     b=s;///b>0
-    c=(g1*s*s)/(2*v*v)-h;///c>0   开口向上，对称轴在负半轴，
+    c=(g1*s*s)/(2*v*v)-h;///   开口向上，对称轴在负半轴，
     temp=b*b-4*a*c;
     double angle_1,angle_2;
+    cout<<"a="<<a<<' '<<"b="<<b<<' '<<"c="<<c<<endl;
+    cout<<"temp="<<temp<<endl;
     if(temp>0)
     {
         mid=(-b+sqrt(temp))/(2*a);
         angle_1=atan(mid);
         mid=(-b-sqrt(temp))/(2*a);
         angle_2=atan(mid);
-        if(angle_1>angle_2)
+        if(angle_reslut>angle_2)
             angle_c=angle_1;
         else
             angle_c=angle_2;
     }
     if(temp<=0)
     {
-        angle_c=0;
+        angle_c=angle_a-angle_b;
     }
-    angle_1=angle_c+angle_b-angle_a;
-/*    CAN_data[2]=50;
-    CAN_data[3]=int(angle_1);*/
+    cout<<angle_1<<" "<<angle_2<<endl;
+    angle_reslut=angle_c+angle_b-angle_a;
+    cout<<angle_reslut<<endl;
+    cout<<SensorAngle<<endl;
+    if(SensorAngle>(angle_reslut-100)&&SensorAngle<(angle_reslut+100)){
+        CAN_data[2] = 0x00; //??stop f1 07 00 00 00 00 00 00
+        //zan ting daoliaoban
+    }
+    else if(SensorAngle<angle_reslut){
+        CAN_data[2] = 0x10;  //down
+        //  tiao jin dao liao ban
+    }
+    else{
+        CAN_data[2] = 0x01; //up
+        //tiao yuan dao liao ban
+    }
+     can_send(CAN_id,CAN_dlc,CAN_data);
+     cout<<"zongxiangkongzhi_end--------------------"<<endl;
+}
 
+void control::vertical_control_Vision(const vector<Point2f>& fallPoints_2D,  const vector<Point3f>& box_UPworld, const int& x_axisFallPoint ){
+    CAN_id=0x18efff4f;///挡料板控制ID
+    CAN_data[0] = 0x00;
+    CAN_data[1] = 0x00;
+    CAN_data[3] = 0x00;
+    CAN_data[4] = 0x00;
+    CAN_data[5] = 0x00;
+    CAN_data[6] = 0x07;
+    CAN_data[7] = 0xF1;
+
+    int ActualFallPointDastance;
+    int IdealFallPointDastance;
+    if(box_UPworld.size()){
+        for(int i=0;i<box_UPworld.size();i++){
+            ActualFallPointDastance += box_UPworld[i].y;
+        }
+        ActualFallPointDastance /= box_UPworld.size();
+        for(int i=0;i<fallPoints_2D.size();i++){
+            if(fallPoints_2D[i].x == x_axisFallPoint){
+                IdealFallPointDastance=fallPoints_2D[i].y;
+                break;
+            }
+        }
+        if(ActualFallPointDastance>(IdealFallPointDastance-100)&&ActualFallPointDastance<(IdealFallPointDastance+100)){
+            CAN_data[2] = 0x00; //??stop f1 07 00 00 00 00 00 00
+            //zan ting daoliaoban
+        }
+        else if(ActualFallPointDastance<IdealFallPointDastance){
+            CAN_data[2] = 0x10;  //down
+            //  tiao jin dao liao ban
+        }
+        else{
+            CAN_data[2] = 0x01; //up
+            //tiao yuan dao liao ban
+        }
+    }
+    can_send(CAN_id,CAN_dlc,CAN_data);
 }
 
 void control::receive_control(){

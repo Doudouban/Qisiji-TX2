@@ -37,9 +37,9 @@ int thick_of_box;//箱子的边缘厚度
 int z_range_x;
 int z_range_y;//求取落点高度平均值的范围
 int plu; //二次寻找落点平均高度时拓宽的范围倍数
-int symbol_step;//根据满溢程度标记落点
+int x_axisFallPoint;//根据满溢程度标记落点
 
-int window_size;//窗口大小
+//int window_size;//窗口大小
 int pipe_range ; //绘制喷洒的范围离中心列的距离 cols/pipe_range
 //int first_frame=8;//起始帧 debug param
 //int last_frame=99;//尾帧数 debug param
@@ -141,7 +141,7 @@ void co_transfer_2(vector<Point3f>& corners,vector<Point>& corners_pixel)
 }
 
 //车筐点云获取
-void box_grub(const Point3f* cloud_3f, vector<Point3f>& box_world, vector<Point2f>& linePoints, int num)
+void box_grub(const Point3f* cloud_3f, vector<Point3f>& box_world, vector<Point3f>& box_UPworld, vector<Point2f>& linePoints, int num)
 {
     clock_t box_grub_start = clock();
     int flag = 0;
@@ -159,24 +159,27 @@ void box_grub(const Point3f* cloud_3f, vector<Point3f>& box_world, vector<Point2
                 y = (int)(cloud_3f[i].y);
                 z = (int)(cloud_3f[i].z);
                 int z_tem = x * R.at<int>(2,0) + y * R.at<int>(2,1) + z * R.at<int>(2,2);
-                if(z_tem >= low && z_tem <= high)//根据高度信息来得到车框
-                {
-                    //Mat p_world = R_float * (Mat_<float> (3,1)<< cloud_3f[i].x, cloud_3f[i].y, cloud_3f[i].z) + t_float;
+                if(z_tem>=low){
                     p_world_x = x * R.at<int>(0,0) + y * R.at<int>(0,1) + z * R.at<int>(0,2);
                     p_world_y = x * R.at<int>(1,0) + y * R.at<int>(1,1) + z * R.at<int>(1,2);
                     p_world_z = z_tem;
-                    //box_world.push_back(Point3f (p_world.at<float>(0,0),p_world.at<float>(1,0),p_world.at<float>(2,0)));
-                    //linePoints.push_back(Point2f(p_world.at<float>(0,0),p_world.at<float>(1,0)));
                     box_world_x	= p_world_x * pow(2, (-1) * fix_fl) + t_float.at<float>(0,0);
                     box_world_y = p_world_y * pow(2, (-1) * fix_fl) + t_float.at<float>(1,0);
                     box_world_z = p_world_z * pow(2, (-1) * fix_fl) + t_float.at<float>(2,0);  ///重新转换成原浮点型，得实际世界坐标
-                    box_world.push_back(Point3f(box_world_x,box_world_y,box_world_z));
-                    linePoints.push_back(Point2f(box_world_x,box_world_y));
+                    if(z_tem <= high)//根据高度信息来得到车框
+                    {
+                        box_world.push_back(Point3f(box_world_x,box_world_y,box_world_z));
+                        linePoints.push_back(Point2f(box_world_x,box_world_y));
+                    }
+                    else if(z_tem <=high+range_up/2) {
+                        box_UPworld.push_back(Point3f(box_world_x,box_world_y,box_world_z));
+                    }
+
                 }
+
             }
         }
     }
-
     clock_t box_grub_end = clock();
     cout << "LLSU === box_grub" << endl;
     cout << "linePoints.size() = " << linePoints.size() <<endl;
@@ -309,13 +312,14 @@ void fallPointFind(Point2f* vertex_original, vector<Point2f>& upfallPoints_2D,ve
     cout << endl;
 }
 //求取落点的高度
-void fallPointWorldFind(const vector<Point3f>& box_world, const vector<Point2f>& fallPoints_2D, vector<Point3f>& fallPoints_world) {
+void fallPointWorldFind(const vector<Point3f>& box_world, vector<Point2f>& fallPoints_2D, vector<Point3f>& fallPoints_world) {
     mutex_.lock();
     cout<<"LLSU===fallPointWroldFind"<<endl;
     clock_t fallPFWorld_start=clock();
     for (int j = 0; j < fallPoints_2D.size(); j++)
     {
-        //cout << "2---->for-----fallPoints_2D.size() = " <<  fallPoints_2D.size() << endl;
+        if(fallPoints_2D[j].x == 0)
+            fallPoints_2D[j].x +=  x_axisFallPoint;
         vector <Point3f> box_world_choose;
         for (int i = 0; i < box_world.size(); i += 2)
         {
@@ -347,7 +351,6 @@ void fallPointWorldFind(const vector<Point3f>& box_world, const vector<Point2f>&
                     box_world_choose.push_back(Point3f(box_world[i].x, box_world[i].y, box_world[i].z));
                 }
             }
-            //cout << "box_world_choose_again = " << box_world_choose.size() << endl;
             if(box_world_choose.size())
             {
                 float z_sum = 0.0;
@@ -369,7 +372,6 @@ void fallPointWorldFind(const vector<Point3f>& box_world, const vector<Point2f>&
     mutex_.unlock();
 }
 
-//const int symbol_step = 80;//mm根据满溢程度标记落点
 //绘制边框落点
 void drawBox(Mat& depth,const vector<Point3f>& fallPoints_world, const vector<Point>& fallPoints_pixel,  const vector<Point>& corners_pixel )
 {
@@ -377,9 +379,9 @@ void drawBox(Mat& depth,const vector<Point3f>& fallPoints_world, const vector<Po
     clock_t drawBox_start=clock();
     //绘制落点
    for (int i = 0; i < fallPoints_world.size(); i++) {
-        if (fallPoints_world[i].z < (height_of_basket + symbol_step)) {
+        if (fallPoints_world[i].z <= (height_of_basket)) {
             circle(depth, fallPoints_pixel[i], 2, cv::Scalar(0, 255, 0), 2);
-        } else if (fallPoints_world[i].z < (height_of_basket + symbol_step * 2)) {
+        } else if (fallPoints_world[i].z <= (height_of_basket+range_up/2)) {
             circle(depth, fallPoints_pixel[i], 2, cv::Scalar(0, 255, 255), 2);
         } else {
             circle(depth, fallPoints_pixel[i], 2, cv::Scalar(0, 0, 255), 2);
@@ -489,16 +491,16 @@ void param()
     filename>>fall_step;
     cout << "fall_step -----> " << fall_step << endl;//100
     filename>>thick_of_box;
-    cout << "thick_of_box----->" << thick_of_box << endl;//10
+    cout << "thick_of_box----->" << thick_of_box << endl;//20
     filename>>z_range_x;
     filename>>z_range_y;
-    cout << "z_range----->" << z_range_x <<" ,  " << z_range_y  << endl;//50,50
+    cout << "z_range----->" << z_range_x <<" ,  " << z_range_y  << endl;//20,50
     filename>>plu;
     cout << "plu----->" << plu << endl;//2
-    filename>>symbol_step;
-    cout << "symbol_step----->" << symbol_step << endl;//20
-    filename>>window_size;
-    cout << "window_size -----> " << window_size << endl;//400
+    filename>>x_axisFallPoint;
+    cout << "x_axisFallPoint----->" << x_axisFallPoint << endl;//50
+//    filename>>window_size;
+//    cout << "window_size -----> " << window_size << endl;//400
     filename>>pipe_range;
     cout << "pipe_range -----> " << pipe_range << endl;//16
     filename>>results_save;
@@ -520,4 +522,12 @@ void show(MainWindow &w)
 {
     w.showFrame();
     w.show();
+}
+
+void saveHeight(int& height)
+{
+    ofstream fout;
+    fout.open("../high.txt");
+    fout << height << endl;
+
 }

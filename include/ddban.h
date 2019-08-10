@@ -15,6 +15,7 @@
 #include <math.h>
 #include <algorithm>
 #include <array>
+#include <fstream>
 #include "can_jetson.hpp"
 #include <mainwindow.h>
 
@@ -24,14 +25,16 @@ using namespace std;
 class control {
 public:
   double car_up;
-  double angle_1;
+  float angle_reslut;
+  double SensorAngle =0;
 
-  void vertical_control(vector<Point2f> &fallPoints_2D);
+  void vertical_control(const vector<Point2f> &fallPoints_2D);
 
-  void traversal_control(vector<Point3f> &fallpoint_world, const int height_of_basket, const int symbol_step,
-                         MainWindow &w);
+  void traversal_control(vector<Point3f> &fallpoint_world, int height_of_basket, const int& symbol_step,
+                         MainWindow &w, const int& fall_step);
 
   void receive_control();
+  void vertical_control_Vision(const vector<Point2f>& fallPoints_2D, const vector<Point3f>& box_UPworld, const int& x_axisFallPoint );
 
   void can_state();
 
@@ -39,19 +42,17 @@ protected:
 
   const float g1 = 9.8;
   const float Pi = 3.1415926;
-  const int arm_r = 1;
-  const int v = 1;
-  const double angle_a = 30;///
-  const double angle_b = 60;
+  const float arm_r = 0.7;
+  const float v = 1.0;
+  const double angle_a = 40;///dangbanyuzhixiande jiajiao
+  const double angle_b = 30;///shuipingmian yu zhixian de jiajiao
   long long CAN_id;
   const int CAN_dlc = 8;
+  int count_r =0 ;
+  int count_l =0 ;
 
-//  array<int, 8> CAN_data = {0, 0, 0, 0, 0, 0, 0, 0};
-//  array<int, 8> receive_data = {0, 0, 0, 0, 0, 0, 0, 0};
   array<int, 8> CAN_data = {{0, 0, 0, 0, 0, 0, 0, 0}};
   array<int, 8> receive_data = {{0, 0, 0, 0, 0, 0, 0, 0}};
-//  array<int, 8> CAN_data = {};
-//  array<int, 8> receive_data ={};
 
   int receive_id;
 };

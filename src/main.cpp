@@ -5,12 +5,15 @@
 #include "jetsonGPIO.hpp"
 #include "key_jetson.hpp"
 #include "mainwindow.h"
+#include "ads1115_i2c.h"
+#include "i2c_device.h"
 #include <QApplication>
 #include <cassert>
 #include <cmath>
 #include <limits>
 #include <thread>
 #include <time.h>
+
 
 static char buffer[1024 * 1024 * 20];
 static int n;
@@ -34,8 +37,8 @@ extern int thick_of_box; //箱子的边缘厚度
 extern int z_range_x;
 extern int z_range_y;   //求取落点高度平均值的范围
 extern int plu;         //二次寻找落点平均高度时拓宽的范围倍数
-extern int symbol_step; //根据满溢程度标记落点
-extern int window_size; //窗口大小
+extern int x_axisFallPoint; //根据满溢程度标记落点
+//extern int window_size; //窗口大小
 extern int pipe_range; //绘制喷洒的范围离中心列的距离 cols/pipe_range
 // int first_frame=8;//起始帧 debug param
 // int last_frame=99;//尾帧数 debug param
@@ -87,6 +90,8 @@ void handleFrame(TY_FRAME_DATA *frame, void *userdata, MainWindow &w,
     Mat depth_, p3d, color, irl, irr;
     Mat depth_1;
     parseFrame(*frame, &depth_, &irl, &irr, &color, &p3d);
+/**************************************************************************************/
+
     depth_1 = depth_;
     depth_1.convertTo(depth_1, CV_8UC1, 32.0 / 255); //进行位深度的转换,2->1字节
     //转换为8位无符号单通道数值，然后乘32.0再除以255；
@@ -96,6 +101,7 @@ void handleFrame(TY_FRAME_DATA *frame, void *userdata, MainWindow &w,
         channels.push_back(depth_1); //进行通道数的转换,从1->3
     }
     merge(channels, depth); //合并三个通道，
+/**********************************************************************************/
 
     cv::Mat background_pic;
     cv::Mat resizedColor;
@@ -144,20 +150,20 @@ void handleFrame(TY_FRAME_DATA *frame, void *userdata, MainWindow &w,
         // depthColor = depthColor / 2 + resized_color / 2;
         // cv::imshow("projected depth", depthColor);
     }
-    // contr1.receive_control();
+/****************************************************************************************/
     if (key_background && w.detec == 0)
         key_background = false;
     if (key_background && w.detec) {
         background_pic = depth;
     } else {
         background_pic = resizedColor;
-        //        w.direction = 0;
     }
 
     w.direction = 0;
-    cout << w.direction
-         << "-------------------------------------------------------" << endl;
     w.key_detect();
+    if(!w.detec){
+        saveHeight(height_of_basket);
+    }
     if (w.detec) {
         if (w.get_height) {
             bool error;
@@ -171,11 +177,11 @@ void handleFrame(TY_FRAME_DATA *frame, void *userdata, MainWindow &w,
                  << endl; /// height_of_basket变量为车厢的最终高度///
             if (height_of_basket < range_high && height_of_basket > range_low) {
                 w.get_height = false;                         ////
-                new_rang_low = height_of_basket - range_down; ////
-                new_rang_high = height_of_basket + range_up;  ////
+                new_rang_low = height_of_basket - range_down; ////rang_down=30;
+                new_rang_high = height_of_basket + range_up;  ////rang_up=30
             }
 
-            w.height = height_of_basket; //-contr1.car_up;
+            w.height = height_of_basket;
         } ///从新设置一下用来截取高度的范围rang_low   high;/////
 
         //------------从相机抓取数据----------------------///
@@ -183,11 +189,11 @@ void handleFrame(TY_FRAME_DATA *frame, void *userdata, MainWindow &w,
         Point3f *cloud_3f = (Point3f *) p3d.data;
         int num = p3d.rows * p3d.cols / ds;
 
-        clock_t start_alg = clock();
         //车筐点云的获取
         vector<Point3f> box_world;
+        vector<Point3f> box_UPworld;
         vector<Point2f> linePoints;
-        box_grub(cloud_3f, box_world, linePoints,
+        box_grub(cloud_3f, box_world, box_UPworld, linePoints,
                  num); ///抓取点云图的点，三维放在box_world,二维放在linepoint;////
         //边沿识别以及交点定位算法,可视化显示
         if (linePoints.size() > 50) {
@@ -204,8 +210,7 @@ void handleFrame(TY_FRAME_DATA *frame, void *userdata, MainWindow &w,
 
             //角点坐标转换, 从世界坐标到相机坐标再到像素坐标
             vector<Point> corners_pixel;
-            //        co_transfer(corners, corners_pixel);
-            //        ///把角点的左边转换成像素坐标
+            //co_transfer(corners, corners_pixel);把角点的左边转换成像素坐标
 
             //--------------2D图中寻找饲料落点并绘制----------------///
             vector<Point2f> fallPoints_2D;
@@ -228,31 +233,18 @@ void handleFrame(TY_FRAME_DATA *frame, void *userdata, MainWindow &w,
             // fall_rule(fallPoints_world);
             //饲料落点坐标转换, 从世界坐标到相机坐标再到像素坐标
             vector<Point> fallPoints_pixel;
-            //        co_transfer_2(fallPoints_world,
-            //        fallPoints_pixel);///将落点的坐标转换成像素坐标系///
+            // co_transfer_2(fallPoints_world,fallPoints_pixel);///将落点的坐标转换成像素坐标系///
             thread t3(co_transfer, corners, ref(corners_pixel));
             thread t4(co_transfer_2, ref(fallPoints_world), ref(fallPoints_pixel));
             t3.join();
             t4.join();
             //绘制边框,落点
-            // drawBox(depth_mid, fallPoints_world,fallPoints_pixel,corners_pixel );
-            // drawBox(depth, fallPoints_world,fallPoints_pixel,corners_pixel );
-
-            vector<Point> fallPoints_pixel_color(4), corners_pixel_color(4);
-            /*
-                    for(int i=0;i<corners_pixel_color.size();i++)
-                    {
-                        corners_pixel_color[i].x=corners_pixel[i].x+30;
-                        corners_pixel_color[i].y=corners_pixel[i].y;
-                        fallPoints_pixel_color[i].x=fallPoints_pixel[i].x+30;
-                        fallPoints_pixel_color[i].y=fallPoints_pixel[i].y;
-                    }
-            */
             drawBox(background_pic, fallPoints_world, fallPoints_pixel,
                     corners_pixel);
-            // contr1.vertical_control(fallPoints_2D);//zong向控制
-            contr1.traversal_control(fallPoints_world, height_of_basket, symbol_step, w); //heng向控制
-
+            contr1.SensorAngle=get_angle();
+            contr1.traversal_control(fallPoints_world, height_of_basket, range_up, w, fall_step); //heng向控制
+            //contr1.vertical_control(fallPoints_2D);//zong向控制
+            contr1.vertical_control_Vision(fallPoints_2D, box_UPworld, x_axisFallPoint);
 
         } else {
             w.index = 0;
@@ -276,18 +268,7 @@ void handleFrame(TY_FRAME_DATA *frame, void *userdata, MainWindow &w,
     contr1.can_state();
     w.pic = background_pic;
     show(w);
-    //    namedWindow("color",CV_WINDOW_NORMAL);
-    //    moveWindow("color",10,10);
-    //    resizeWindow("color",window_size,window_size);
-    //    imshow( "color", resizedColor );
 
-    /*    namedWindow("depth",CV_WINDOW_NORMAL);
-        moveWindow("depth",1000,10);
-        resizeWindow("depth",window_size,window_size);
-        imshow( "depth", depth_mid );*/
-
-    // moveWindow("depth_1",100,100);
-    // imshow("depth_1",resizedColor);
 
     save_or_not(background_pic, depth_, color, p3d, pData->index);
 
@@ -430,6 +411,7 @@ int main(int argc, char *argv[]) {
     exit_main = false;
     gpio_init();
     can_init();
+    get_angle_init();
     // pre work
     param();     ////从文件中读取各种参数////
     getRt();     ///从RT文件中读取RT矩阵////
