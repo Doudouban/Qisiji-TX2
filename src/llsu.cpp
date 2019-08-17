@@ -37,7 +37,11 @@ int thick_of_box;//箱子的边缘厚度
 int z_range_x;
 int z_range_y;//求取落点高度平均值的范围
 int plu; //二次寻找落点平均高度时拓宽的范围倍数
+int v1;
+int v2;
+int v3;
 int x_axisFallPoint;//根据满溢程度标记落点
+int car_high;
 
 //int window_size;//窗口大小
 int pipe_range ; //绘制喷洒的范围离中心列的距离 cols/pipe_range
@@ -149,6 +153,7 @@ void box_grub(const Point3f* cloud_3f, vector<Point3f>& box_world, vector<Point3
     int p_world_x, p_world_y, p_world_z;
     int low = (new_rang_low - t.at<int>(2, 0)) << fix_fl;
     int high = (new_rang_high - t.at<int>(2, 0)) << fix_fl;/////由于RT矩阵都已转化成整型，
+    int boxUP = ((new_rang_high+range_up/2)-t.at<int>(2,0))<< fix_fl;
     float box_world_x, box_world_y, box_world_z;
     if(num){
         for(int i = 0; i < num; i = i + ds ){
@@ -160,18 +165,27 @@ void box_grub(const Point3f* cloud_3f, vector<Point3f>& box_world, vector<Point3
                 z = (int)(cloud_3f[i].z);
                 int z_tem = x * R.at<int>(2,0) + y * R.at<int>(2,1) + z * R.at<int>(2,2);
                 if(z_tem>=low){
-                    p_world_x = x * R.at<int>(0,0) + y * R.at<int>(0,1) + z * R.at<int>(0,2);
-                    p_world_y = x * R.at<int>(1,0) + y * R.at<int>(1,1) + z * R.at<int>(1,2);
-                    p_world_z = z_tem;
-                    box_world_x	= p_world_x * pow(2, (-1) * fix_fl) + t_float.at<float>(0,0);
-                    box_world_y = p_world_y * pow(2, (-1) * fix_fl) + t_float.at<float>(1,0);
-                    box_world_z = p_world_z * pow(2, (-1) * fix_fl) + t_float.at<float>(2,0);  ///重新转换成原浮点型，得实际世界坐标
                     if(z_tem <= high)//根据高度信息来得到车框
                     {
+                        p_world_x = x * R.at<int>(0,0) + y * R.at<int>(0,1) + z * R.at<int>(0,2);
+                        p_world_y = x * R.at<int>(1,0) + y * R.at<int>(1,1) + z * R.at<int>(1,2);
+                        p_world_z = z_tem;
+                        box_world_x = p_world_x * pow(2, (-1) * fix_fl) + t_float.at<float>(0,0);
+                        box_world_y = p_world_y * pow(2, (-1) * fix_fl) + t_float.at<float>(1,0);
+                        box_world_z = p_world_z * pow(2, (-1) * fix_fl) + t_float.at<float>(2,0);  ///重新转换成原浮点型，得实际世界坐标
+
                         box_world.push_back(Point3f(box_world_x,box_world_y,box_world_z));
                         linePoints.push_back(Point2f(box_world_x,box_world_y));
+
                     }
-                    else if(z_tem <=high+range_up/2) {
+                    else if(z_tem <=boxUP) {
+                        p_world_x = x * R.at<int>(0,0) + y * R.at<int>(0,1) + z * R.at<int>(0,2);
+                        p_world_y = x * R.at<int>(1,0) + y * R.at<int>(1,1) + z * R.at<int>(1,2);
+                        p_world_z = z_tem;
+                        box_world_x = p_world_x * pow(2, (-1) * fix_fl) + t_float.at<float>(0,0);
+                        box_world_y = p_world_y * pow(2, (-1) * fix_fl) + t_float.at<float>(1,0);
+                        box_world_z = p_world_z * pow(2, (-1) * fix_fl) + t_float.at<float>(2,0);  ///重新转换成原浮点型，得实际世界坐标
+
                         box_UPworld.push_back(Point3f(box_world_x,box_world_y,box_world_z));
                     }
 
@@ -185,6 +199,7 @@ void box_grub(const Point3f* cloud_3f, vector<Point3f>& box_world, vector<Point3
     cout << "linePoints.size() = " << linePoints.size() <<endl;
     cout << "box_grub_time = " << (box_grub_end - box_grub_start)/1000 << " ms " << endl;
     cout << "num = " << num << " flag = " << flag << endl;
+    cout<<"box_world.size="<<box_world.size()<<endl;
     cout << endl;
 }
 
@@ -381,7 +396,7 @@ void drawBox(Mat& depth,const vector<Point3f>& fallPoints_world, const vector<Po
    for (int i = 0; i < fallPoints_world.size(); i++) {
         if (fallPoints_world[i].z <= (height_of_basket)) {
             circle(depth, fallPoints_pixel[i], 2, cv::Scalar(0, 255, 0), 2);
-        } else if (fallPoints_world[i].z <= (height_of_basket+range_up/2)) {
+        } else if (fallPoints_world[i].z <= (height_of_basket+range_up/3)) {
             circle(depth, fallPoints_pixel[i], 2, cv::Scalar(0, 255, 255), 2);
         } else {
             circle(depth, fallPoints_pixel[i], 2, cv::Scalar(0, 0, 255), 2);
@@ -511,6 +526,14 @@ void param()
     cout << "depth_save -----> " << depth_save << endl;
     cout << "color_save -----> " << color_save << endl;
     cout << "cloud_save -----> " << cloud_save << endl;
+    filename>>v1;
+    filename>>v2;
+    filename>>v3;
+    cout<<"v1---------------->"<<v1<<endl;
+    cout<<"v2---------------->"<<v2<<endl;
+    cout<<"v3---------------->"<<v3<<endl;
+    filename>>car_high;
+    cout<<"car_high---------------->"<<car_high<<endl;
     filename.close();
     cout << endl;
     clock_t param_end=clock();

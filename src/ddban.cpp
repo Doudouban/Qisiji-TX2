@@ -3,19 +3,18 @@
 //
 
 #include "ddban.h"
-
 extern bool key_detection;
 
-void control::traversal_control(vector<Point3f>& fallpoint_world,int height_of_basket, const int& symbol_step, MainWindow &w, const int& fall_step) {
+void control::traversal_control(vector<Point3f>& fallpoint_world,int height_of_basket, MainWindow &w, const int& fall_step) {
     ///横向
     CAN_id=0x18efff4f;
-    CAN_data[0] = 0x00;
+    CAN_data[0] = 0xF1;
+    CAN_data[1] = 0x07;
     CAN_data[2] = 0x00;
     CAN_data[3] = 0x00;
     CAN_data[4] = 0x00;
     CAN_data[5] = 0x00;
-    CAN_data[6] = 0x07;
-    CAN_data[7] = 0xF1;
+    CAN_data[7] = 0x00;
     for (int i = 0; i < fallpoint_world.size(); i++) {
         for (int j = fallpoint_world.size() - 1; j > i; j--) {
             if (fallpoint_world[i].x < fallpoint_world[j].x) {
@@ -35,12 +34,13 @@ void control::traversal_control(vector<Point3f>& fallpoint_world,int height_of_b
         filename.open("../high.txt");
         filename>>height_of_basket;
         filename.close();
-        CAN_data[1]=0x00; //stop
+        //CAN_data[6]=0x00; //stop
         w.direction = 0;
     }
     else if(fallpoint_world[0].x<fall_step){
-        CAN_data[1]=0x01; //turn left slowly
+        CAN_data[6]=0x10; //turn left slowly
         w.direction = 2;
+        can_send(CAN_id,CAN_dlc,CAN_data);
     }
     else {
         for (int i = 0; i <fallpoint_world.size(); ++i) {
@@ -49,10 +49,10 @@ void control::traversal_control(vector<Point3f>& fallpoint_world,int height_of_b
                 if(i>fallpoint_world.size()-1)
                     break;
             }
-        if ((fallpoint_world[i].z <= height_of_basket+symbol_step/2)&&(i!=0)) {
+        if ((fallpoint_world[i].z <= height_of_basket+range_up/2)&&(i!=0)) {
             cout<<"i="<<i<<endl;
             if ((fallpoint_world[i].x <= (fall_step/2)) && (fallpoint_world[i].x >= -(fall_step/2))) {
-                CAN_data[1]=0x00; //stop?? f1 07 00 00 00 00 00 00
+                //CAN_data[6]=0x00; //stop?? f1 07 00 00 00 00 00 00
                 w.direction = 0;
                 count_l=0;
                 count_r=0;
@@ -62,9 +62,10 @@ void control::traversal_control(vector<Point3f>& fallpoint_world,int height_of_b
             else if((fallpoint_world[i].x) > (fall_step/2) && (++count_r >2)) {
                 count_l = 0;
                 if (fallpoint_world[i].x < 3*(fall_step/2)) {
-                    CAN_data[1]=0x10;//turn right slowly
+                    CAN_data[6]=0x01;//turn right slowly
                     cout<<"1111111111"<<endl;
                     w.direction = 1;
+                    can_send(CAN_id,CAN_dlc,CAN_data);
                     break;
 
                 }
@@ -78,9 +79,10 @@ void control::traversal_control(vector<Point3f>& fallpoint_world,int height_of_b
                     break;
 
                 } */else{
-                    CAN_data[1]=0x50;//turn right fast
+                    CAN_data[6]=0x05;//turn right fast
                     w.direction = 1;
                     cout<<"333333333"<<endl;
+                    can_send(CAN_id,CAN_dlc,CAN_data);
                     break;
                 }
 
@@ -88,9 +90,10 @@ void control::traversal_control(vector<Point3f>& fallpoint_world,int height_of_b
             else if ((fallpoint_world[i].x) < -(fall_step/2) && (++count_l >2)) {
                 count_r = 0;
                 if(fallpoint_world[i].x>20){
-                    CAN_data[1]=0x01;//turn left slowly
+                    CAN_data[6]=0x10;//turn left slowly
                     w.direction = 2;
                     cout<<"44444444444"<<endl;
+                    can_send(CAN_id,CAN_dlc,CAN_data);
                     break;
                 }
 //                else if(fallpoint_world[i].x>-3*(fall_step/2)){
@@ -103,9 +106,10 @@ void control::traversal_control(vector<Point3f>& fallpoint_world,int height_of_b
 //                    break;
 //                }
                 else{
-                    CAN_data[1]=0x05;//turn left fast
+                    CAN_data[6]=0x50;//turn left fast
                     w.direction = 2;
                     cout<<"66666666666"<<endl;
+                    can_send(CAN_id,CAN_dlc,CAN_data);
                     break;
                 }
 
@@ -115,26 +119,147 @@ void control::traversal_control(vector<Point3f>& fallpoint_world,int height_of_b
 
     }
     }
-    can_send(CAN_id,CAN_dlc,CAN_data);
+    //can_send(CAN_id,CAN_dlc,CAN_data);
+}
+void control::all_control(vector<Point3f>& fallpoint_world,int height_of_basket, MainWindow &w, const int& fall_step, const vector<Point2f>& fallPoints_2D, const vector<Point3f>& box_UPworld, const int& x_axisFallPoint){
+    CAN_id=0x18efff4f;///挡料板控制ID
+    CAN_data[0] = 0xF1;
+    CAN_data[1] = 0x07;
+    CAN_data[2] = 0x00;
+    CAN_data[3] = 0x00;
+    CAN_data[4] = 0x00;
+    CAN_data[7] = 0x00;
+    for (int i = 0; i < fallpoint_world.size(); i++) {
+        for (int j = fallpoint_world.size() - 1; j > i; j--) {
+            if (fallpoint_world[i].x < fallpoint_world[j].x) {
+                Point3f point = fallpoint_world[i];
+                fallpoint_world[i] = fallpoint_world[j];
+                fallpoint_world[j] = point;
+            }
+        }
+    }
+    if(fallpoint_world.size()==0){
+        ifstream filename;
+        filename.open("../high.txt");
+        filename>>height_of_basket;
+        filename.close();
+        CAN_data[6]=0x00; //stop
+        w.direction = 0;
+    }
+    else if(fallpoint_world[0].x<fall_step){
+        CAN_data[6]=0x10; //turn left slowly
+        w.direction = 2;
+    }
+    else {
+        for (int i = 0; i <fallpoint_world.size(); ++i) {
+            if (fallpoint_world[i].z > height_of_basket) {
+                i++;
+                if(i>fallpoint_world.size()-1)
+                    break;
+            }
+        if ((fallpoint_world[i].z <= height_of_basket+range_up/2)&&(i!=0)) {
+            cout<<"i="<<i<<endl;
+            if ((fallpoint_world[i].x <= (fall_step/2)) && (fallpoint_world[i].x >= -(fall_step/2))) {
+                CAN_data[6]=0x00; //stop?? f1 07 00 00 00 00 00 00
+                w.direction = 0;
+                count_l=0;
+                count_r=0;
+                cout<<"000000000000"<<endl;
+                break;
+            }
+            else if((fallpoint_world[i].x) > (2*fall_step/3) && (++count_r >2)) {
+                count_l = 0;
+                if (fallpoint_world[i].x < 3*fall_step/2) {
+                    CAN_data[6]=0x01;//turn right slowly
+                    cout<<"1111111111"<<endl;
+                    w.direction = 1;
+                    break;
+
+                }
+                else {
+                    CAN_data[6]=0x05;//turn right fast
+                    w.direction = 1;
+                    cout<<"333333333"<<endl;
+                    break;
+                }
+
+            }
+            else if ((fallpoint_world[i].x) < -2*(fall_step/3) && (++count_l >2)) {
+                count_r = 0;
+                if(fallpoint_world[i].x>-3*fall_step/2){
+                    CAN_data[6]=0x10;//turn left slowly
+                    w.direction = 2;
+                    cout<<"44444444444"<<endl;
+                    break;
+                }
+                else {
+                    CAN_data[6]=0x50;//turn left fast
+                    w.direction = 2;
+                    cout<<"66666666666"<<endl;
+                    break;
+                }
+
+            }
+            break;
+        }
+    }
+    }
+
+    cout<<"zongxiangkongzhiVision_start--------------------"<<endl;
+    int ActualFallPointDastance;
+    int IdealFallPointDastance;
+    cout<<"box_UPworld.size="<<box_UPworld.size()<<endl;
+    if(box_UPworld.size()){
+        for(int i=0;i<box_UPworld.size();i++){
+            ActualFallPointDastance += box_UPworld[i].y;
+        }
+        ActualFallPointDastance /= box_UPworld.size();
+        for(int i=0;i<fallPoints_2D.size();i++){
+            if(fallPoints_2D[i].x == x_axisFallPoint){
+                IdealFallPointDastance=fallPoints_2D[i].y;
+                break;
+            }
+        }
+        if(ActualFallPointDastance>(IdealFallPointDastance-250)&&ActualFallPointDastance<(IdealFallPointDastance+250)){
+            CAN_data[5] = 0x00; //??stop f1 07 00 00 00 00 00 00
+            //zan ting daoliaoban
+            cout<<"---------------------------------------------------------------------------------------okey"<<endl;
+        }
+        else if(ActualFallPointDastance<IdealFallPointDastance){
+            CAN_data[5] = 0x10;  //down
+            //  tiao jin dao liao ban
+            cout<<"---------------------------------------------------------------------------------------down"<<endl;
+        }
+        else{
+            CAN_data[5] = 0x01; //up
+            //tiao yuan dao liao ban
+            cout<<"---------------------------------------------------------------------------------------up"<<endl;
+        }
+    }
+    if(CAN_data[5]!=0&&CAN_data[6]!=0){
+        can_send(CAN_id,CAN_dlc,CAN_data);
+    }
+
+     cout<<"zongxiangkongzhiVision_end--------------------"<<endl;
 }
 void control::vertical_control(const vector<Point2f>& fallPoints_2D )  //喷头角度与落点的关系
 {
     cout<<"zongxiangkongzhi_start--------------------"<<endl;
     CAN_id=0x18efff4f;///挡料板控制ID
-    CAN_data[0] = 0x00;
-    CAN_data[1] = 0x00;
+    CAN_data[0] = 0xF1;
+    CAN_data[1] = 0x07;
+    CAN_data[2] = 0x00;
     CAN_data[3] = 0x00;
     CAN_data[4] = 0x00;
-    CAN_data[5] = 0x00;
-    CAN_data[6] = 0x07;
-    CAN_data[7] = 0xF1;
+    CAN_data[6] = 0x00;
+    CAN_data[7] = 0x00;
     double a,b,c,temp,mid;
     double s,h;
     double right_fallpoint_d;
     double angle_c; ///结算出挡板与水平线的夹角
     for(int i=0;i<fallPoints_2D.size();i++){
         if(fallPoints_2D[i].x==50){
-            right_fallpoint_d=fallPoints_2D[i].y;
+            right_fallpoint_d=fallPoints_2D[i].y/1000;
             break;
 
         }
@@ -169,16 +294,16 @@ void control::vertical_control(const vector<Point2f>& fallPoints_2D )  //喷头�
     angle_reslut=angle_c+angle_b-angle_a;
     cout<<angle_reslut<<endl;
     cout<<SensorAngle<<endl;
-    if(SensorAngle>(angle_reslut-100)&&SensorAngle<(angle_reslut+100)){
-        CAN_data[2] = 0x00; //??stop f1 07 00 00 00 00 00 00
+    if(SensorAngle>(angle_reslut)&&SensorAngle<(angle_reslut)){
+        CAN_data[5] = 0x00; //??stop f1 07 00 00 00 00 00 00
         //zan ting daoliaoban
     }
     else if(SensorAngle<angle_reslut){
-        CAN_data[2] = 0x10;  //down
+        CAN_data[5] = 0x10;  //down
         //  tiao jin dao liao ban
     }
     else{
-        CAN_data[2] = 0x01; //up
+        CAN_data[5] = 0x01; //up
         //tiao yuan dao liao ban
     }
      can_send(CAN_id,CAN_dlc,CAN_data);
@@ -187,16 +312,17 @@ void control::vertical_control(const vector<Point2f>& fallPoints_2D )  //喷头�
 
 void control::vertical_control_Vision(const vector<Point2f>& fallPoints_2D,  const vector<Point3f>& box_UPworld, const int& x_axisFallPoint ){
     CAN_id=0x18efff4f;///挡料板控制ID
-    CAN_data[0] = 0x00;
-    CAN_data[1] = 0x00;
+    CAN_data[0] = 0xF1;
+    CAN_data[1] = 0x07;
+    CAN_data[2] = 0x00;
     CAN_data[3] = 0x00;
     CAN_data[4] = 0x00;
-    CAN_data[5] = 0x00;
-    CAN_data[6] = 0x07;
-    CAN_data[7] = 0xF1;
-
+    CAN_data[6] = 0x00;
+    CAN_data[7] = 0x00;
+    cout<<"zongxiangkongzhiVision_start--------------------"<<endl;
     int ActualFallPointDastance;
     int IdealFallPointDastance;
+    cout<<"box_UPworld.size="<<box_UPworld.size()<<endl;
     if(box_UPworld.size()){
         for(int i=0;i<box_UPworld.size();i++){
             ActualFallPointDastance += box_UPworld[i].y;
@@ -208,34 +334,84 @@ void control::vertical_control_Vision(const vector<Point2f>& fallPoints_2D,  con
                 break;
             }
         }
-        if(ActualFallPointDastance>(IdealFallPointDastance-100)&&ActualFallPointDastance<(IdealFallPointDastance+100)){
-            CAN_data[2] = 0x00; //??stop f1 07 00 00 00 00 00 00
+        if(ActualFallPointDastance>(IdealFallPointDastance-250)&&ActualFallPointDastance<(IdealFallPointDastance+250)){
+            //CAN_data[5] = 0x00; //??stop f1 07 00 00 00 00 00 00
             //zan ting daoliaoban
+            cout<<"---------------------------------------------------------------------------------------okey"<<endl;
         }
         else if(ActualFallPointDastance<IdealFallPointDastance){
-            CAN_data[2] = 0x10;  //down
+            CAN_data[5] = 0x10;  //down
+            can_send(CAN_id,CAN_dlc,CAN_data);
             //  tiao jin dao liao ban
+            cout<<"---------------------------------------------------------------------------------------down"<<endl;
         }
         else{
-            CAN_data[2] = 0x01; //up
+            CAN_data[5] = 0x01; //up
+            can_send(CAN_id,CAN_dlc,CAN_data);
             //tiao yuan dao liao ban
+            cout<<"---------------------------------------------------------------------------------------up"<<endl;
         }
     }
-    can_send(CAN_id,CAN_dlc,CAN_data);
+    //can_send(CAN_id,CAN_dlc,CAN_data);
+     cout<<"zongxiangkongzhiVision_end--------------------"<<endl;
 }
 
 void control::receive_control(){
     can_receive(receive_id,receive_data);
-    if(receive_id==0x98ec1727){
-        car_up=(receive_data[0]+receive_data[1]*16*16);
-    } else if(receive_id==0x98eFff27) {
-        if (receive_data[0] == 0xB0 || receive_data[0] == 0xB1)
-            key_detection = true;
-    }
+   if(receive_id==0x18EFFF4F) {
+        if (detect){
+            if(receive_data[0]==0xF1&&receive_data[1]==0x07&&receive_data[2]==0x00&&receive_data[3]==0x00&&receive_data[4]==0x00&&receive_data[7]==0x00){
+                if(receive_data[5]==0x00&&(receive_data[6]==0x10||receive_data[0]==0x01)){
+                    key_detection = true;
+                }else if(receive_data[5]==0x00&&(receive_data[6]==0x50||receive_data[0]==0x05)){
+                    key_detection = true;
+                }else if(receive_data[6]==0x00&&(receive_data[6]==0x10||receive_data[0]==0x01)){
+                    key_detection = true;
+                }
+            }
+         }
+     }
+   else if(receive_id==0x1CE65526){
+        velocity1=receive_data[0];
+        velocity2=receive_data[1];
+        velocity3=receive_data[2];
+        rev_velocity=true;
+   }
 
 }
+void control::CAN_back_velocity(){
+        CAN_id=0x1ce63326;
+        int t=velocity1;
+        CAN_data={0x05,0x1D,0x04,0xFF,velocity1};
+        can_send(CAN_id,CAN_dlc,CAN_data);
+        delay_ms(1);
+        CAN_data={0x05,0xF0,0x03,0xFF,velocity2};
+        can_send(CAN_id,CAN_dlc,CAN_data);
+        delay_ms(1);
+        CAN_data={0x05,0x23,0x04,0xFF,velocity3};
+        can_send(CAN_id,CAN_dlc,CAN_data);
+}
 void control::can_state(){
-    CAN_data = {0, 0, 0, 0, 0, 0, 0, 0xF0};
-    CAN_id = 0X18ec274f;
+    CAN_data = {1, 1, 1, 1, 1, 1, 1, 1};
+    CAN_id = 0X1ce62655;
     can_send(CAN_id, CAN_dlc, CAN_data);
 }
+
+void control::delay_ms(int ms) {
+
+    usleep(ms * 10000); // 微妙us
+
+}
+void control::Set_velocity(){
+    CAN_id=0x1ce63326;
+    int t=velocity1;
+    CAN_data={0x05,0x1D,0x04,0xFF,set_velocity[0]};
+    can_send(CAN_id,CAN_dlc,CAN_data);
+    delay_ms(1);
+    CAN_data={0x05,0xF0,0x03,0xFF,set_velocity[1]};
+    can_send(CAN_id,CAN_dlc,CAN_data);
+    delay_ms(1);
+    CAN_data={0x05,0x23,0x04,0xFF,set_velocity[2]};
+    can_send(CAN_id,CAN_dlc,CAN_data);
+}
+

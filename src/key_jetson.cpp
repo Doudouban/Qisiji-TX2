@@ -53,10 +53,10 @@ int key() {
     if (key_num) {
         switch (key_num) {
         case KEY1_id:cout << " ---- KEY1 PRESS ---- \n";
-            key_detection = true;
+            key_height = true;
             break;
         case KEY2_id:cout << " ---- KEY2 PRESS ---- \n";
-            key_height = true;
+            key_detection = true;
             break;
         case KEY3_id:cout << " ---- KEY3 PRESS ---- \n";
             key_background = !key_background;

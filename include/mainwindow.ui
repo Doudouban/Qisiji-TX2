@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1280</width>
-    <height>720</height>
+    <height>800</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,7 +26,7 @@
       <x>0</x>
       <y>0</y>
       <width>1280</width>
-      <height>720</height>
+      <height>800</height>
      </rect>
     </property>
     <property name="text">
@@ -40,7 +40,7 @@
     <property name="geometry">
      <rect>
       <x>130</x>
-      <y>610</y>
+      <y>680</y>
       <width>151</width>
       <height>101</height>
      </rect>
@@ -59,7 +59,7 @@
     <property name="geometry">
      <rect>
       <x>300</x>
-      <y>610</y>
+      <y>680</y>
       <width>151</width>
       <height>101</height>
      </rect>
@@ -81,7 +81,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>610</y>
+      <y>680</y>
       <width>101</width>
       <height>101</height>
      </rect>
@@ -103,10 +103,13 @@
     <property name="geometry">
      <rect>
       <x>300</x>
-      <y>610</y>
+      <y>680</y>
       <width>151</width>
       <height>101</height>
      </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
     </property>
     <property name="styleSheet">
      <string notr="true"/>

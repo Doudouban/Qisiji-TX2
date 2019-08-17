@@ -46,6 +46,10 @@ extern int results_save;
 extern int depth_save;
 extern int color_save;
 extern int cloud_save;
+extern int v1;
+extern int v2;
+extern int v3;
+extern int car_high;
 
 bool key_detection = false;
 bool key_height = false;
@@ -158,13 +162,27 @@ void handleFrame(TY_FRAME_DATA *frame, void *userdata, MainWindow &w,
     } else {
         background_pic = resizedColor;
     }
-
+    bool auto_start = key_detection;
     w.direction = 0;
+    if(auto_start&&w.detec){
+        contr1.CAN_back_velocity();
+    }
+    if(w.detec&&contr1.rev_velocity){
+        contr1.set_velocity[0]=v1;
+        contr1.set_velocity[1]=v2;
+        contr1.set_velocity[2]=v3;
+        contr1.Set_velocity();
+        contr1.rev_velocity=false;
+    }
     w.key_detect();
-    if(!w.detec){
+    if(!w.detec&&auto_start){
         saveHeight(height_of_basket);
     }
+    contr1.detect = w.detec;
     if (w.detec) {
+        if(auto_start){
+           contr1.can_state();
+        }
         if (w.get_height) {
             bool error;
             cout << "进入获取高度函数" << endl;
@@ -175,13 +193,13 @@ void handleFrame(TY_FRAME_DATA *frame, void *userdata, MainWindow &w,
             cout << "------------------>"
                  << "height_of_basket = " << height_of_basket
                  << endl; /// height_of_basket变量为车厢的最终高度///
-            if (height_of_basket < range_high && height_of_basket > range_low) {
+            if (height_of_basket < range_high-car_high && height_of_basket > range_low-car_high) {
                 w.get_height = false;                         ////
                 new_rang_low = height_of_basket - range_down; ////rang_down=30;
                 new_rang_high = height_of_basket + range_up;  ////rang_up=30
             }
 
-            w.height = height_of_basket;
+            w.height = height_of_basket+car_high;
         } ///从新设置一下用来截取高度的范围rang_low   high;/////
 
         //------------从相机抓取数据----------------------///
@@ -241,10 +259,12 @@ void handleFrame(TY_FRAME_DATA *frame, void *userdata, MainWindow &w,
             //绘制边框,落点
             drawBox(background_pic, fallPoints_world, fallPoints_pixel,
                     corners_pixel);
+            contr1.range_up=range_up;
             contr1.SensorAngle=get_angle();
-            contr1.traversal_control(fallPoints_world, height_of_basket, range_up, w, fall_step); //heng向控制
+            //contr1.traversal_control(fallPoints_world, height_of_basket,w, fall_step); //heng向控制
             //contr1.vertical_control(fallPoints_2D);//zong向控制
-            contr1.vertical_control_Vision(fallPoints_2D, box_UPworld, x_axisFallPoint);
+            //contr1.vertical_control_Vision(fallPoints_2D, box_UPworld, x_axisFallPoint);
+            contr1.all_control(fallPoints_world, height_of_basket,w, fall_step,fallPoints_2D,  box_UPworld, x_axisFallPoint);
 
         } else {
             w.index = 0;
@@ -265,7 +285,6 @@ void handleFrame(TY_FRAME_DATA *frame, void *userdata, MainWindow &w,
              Point(depth_w_right, depth_h / 4), Scalar(0, 255, 0), 2,
              CV_AA); ///画右边的饲料下落边界
     }
-    contr1.can_state();
     w.pic = background_pic;
     show(w);
 
@@ -417,18 +436,15 @@ int main(int argc, char *argv[]) {
     getRt();     ///从RT文件中读取RT矩阵////
     quantized(); ////把folat型转化为int型，提高算法的速度////
     cout << "llsu1" << endl;
-
     control contr1;
-
     thread tc(while_control, ref(contr1)); ///单独踢出一个线程用来做CAN接受
-    tc.detach();
-
+    //tc.detach();
     thread tt(while_key);
-    tt.detach(); ///单独踢出一个线程用来做按键检测
-
+    //tt.detach(); ///单独踢出一个线程用来做按键检测
     QApplication a(argc, argv);
     MainWindow w; /// QT界面开发
-
+    w.range_low=range_low;
+    w.range_high=range_high;
     while (!exit_main) {
         clock_t while_start = clock();
         TY_FRAME_DATA frame;
@@ -442,13 +458,20 @@ int main(int argc, char *argv[]) {
             handleFrame(&frame, &cb_data, w, contr1);
             clock_t get_frame_end = clock();
 
-            cout << "get_frame_time=" << (get_frame_end - get_frame_start) / 1000
+            cout << "get_frame_time=" << dec << (get_frame_end - get_frame_start) / 1000
                  << "ms" << endl;
         }
         clock_t while_end = clock();
-        cout << "while_time=" << (while_end - while_start) / 1000 << "ms" << endl;
+        cout << "while_time=" << dec << (while_end - while_start) / 1000 << "ms" << endl;
     }
     key_ = false;
+    //thread tc(while_control, ref(contr1)); ///单独踢出一个线程用来做CAN接受
+    // tc.detach();
+    //thread tt(while_key);
+    //tt.detach(); ///单独踢出一个线程用来做按键检测
+    tc.join();
+    tt.join();
+    gpio_close();
     can_closed();
     ASSERT_OK(TYStopCapture(hDevice));
     ASSERT_OK(TYCloseDevice(hDevice));

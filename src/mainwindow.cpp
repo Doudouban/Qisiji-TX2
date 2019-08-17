@@ -92,9 +92,9 @@ void MainWindow::showFrame() {
     }
     //获取高度
     ui->label_4->setText(QString::number(height));
-    if (height > 200 && height < 500 && detec) {
+    if (height > range_low && height < range_high && detec) {
       ui->label_4->setStyleSheet("background-color: rgb(0,255,0);");
-    } else if (height > 200 && height < 500 && !detec) {
+    } else if (height > range_low && height < range_high && !detec) {
       ui->label_4->setStyleSheet("background-color: rgb(192,192,192);");
     } else if (height <= 0) {
       ui->label_4->setStyleSheet("background-color: rgb(192,192,192);");
@@ -114,7 +114,7 @@ void MainWindow::showFrame() {
 
     //缓冲图片
     ui->label_5->setMovie(mov);
-    ui->label_5->setFixedSize(171, 121);
+    ui->label_5->setFixedSize(151, 101);
     ui->label_5->setScaledContents(true);
   }
 }

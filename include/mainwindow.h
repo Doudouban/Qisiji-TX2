@@ -30,6 +30,8 @@ public:
     cv::Mat pic;
     bool index;
     int height = 0;
+    int range_low;
+    int range_high;
     bool detec = false;
     bool get_height = true;
     int direction = 0;

@@ -1,5 +1,3 @@
-
-
 #ifndef CAN_CODE_CAN_BUS_JETSON_HPP
 #define CAN_CODE_CAN_BUS_JETSON_HPP
 
@@ -15,21 +13,32 @@ public:
     int
 };*/
 
-// TODO
-enum can_bitrate {
-  _100k = 100000,
-  _500k = 500000,
-
+enum can_baudRate {
+    baud_100k = 100000,
+    baud_500k = 500000,
+    baud_1M = 1000000,
 };
 
 enum canX {
+    CAN_PORT_0 = 0, // can0
+    CAN_PORT_1 = 1, // can1
 
 };
 
-int can_init();
-int can_closed();
-void can_send(const int &can_id, const int &can_dlc, const array<int, 8> &a);
-void can_receive(int &id, array<int, 8> &a);
+// TODO
+// class CAN_Device
+//{
+//  public:
+//    can_baudRate baud_rate;
+//    canX can_port;
+//
+//
+//};
+
+int can_init(unsigned int can_device = 0, unsigned int baudRate = 250000);
+int can_closed(unsigned int can_device = 0);
+void can_send(unsigned int &can_id, unsigned int &can_dlc, const array<int, 8> &a);
+void can_receive(unsigned int &id, array<int, 8> &a);
 
 #endif // CAN_CODE_CAN_BUS_JETSON_HPP
 
