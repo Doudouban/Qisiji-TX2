@@ -445,6 +445,7 @@ int main(int argc, char *argv[]) {
     MainWindow w; /// QT界面开发
     w.range_low=range_low;
     w.range_high=range_high;
+    contr1.x_axisFallPoint = x_axisFallPoint;
     while (!exit_main) {
         clock_t while_start = clock();
         TY_FRAME_DATA frame;

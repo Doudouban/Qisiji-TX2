@@ -96,7 +96,7 @@ void MainWindow::showFrame() {
       ui->label_4->setStyleSheet("background-color: rgb(0,255,0);");
     } else if (height > range_low && height < range_high && !detec) {
       ui->label_4->setStyleSheet("background-color: rgb(192,192,192);");
-    } else if (height <= 0) {
+    } else if (height <= range_low) {
       ui->label_4->setStyleSheet("background-color: rgb(192,192,192);");
     } else {
       ui->label_4->setStyleSheet("background-color: rgb(255,0,0);");

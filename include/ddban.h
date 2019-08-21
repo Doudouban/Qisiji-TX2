@@ -32,6 +32,7 @@ public:
   bool detect;
   int set_velocity[3];
   bool rev_velocity=false;
+  int x_axisFallPoint;
   void vertical_control(const vector<Point2f> &fallPoints_2D);
 
   void traversal_control(vector<Point3f> &fallpoint_world, int height_of_basket, 
@@ -60,6 +61,7 @@ protected:
   int velocity1 =0;
   int velocity2 =0;
   int velocity3 =0;
+  int threshold =4;
   
   array<int, 8> CAN_data = {{0, 0, 0, 0, 0, 0, 0, 0}};
   array<int, 8> receive_data = {{0, 0, 0, 0, 0, 0, 0, 0}};

@@ -42,6 +42,7 @@ int v2;
 int v3;
 int x_axisFallPoint;//根据满溢程度标记落点
 int car_high;
+int box_up;
 
 //int window_size;//窗口大小
 int pipe_range ; //绘制喷洒的范围离中心列的距离 cols/pipe_range
@@ -153,7 +154,7 @@ void box_grub(const Point3f* cloud_3f, vector<Point3f>& box_world, vector<Point3
     int p_world_x, p_world_y, p_world_z;
     int low = (new_rang_low - t.at<int>(2, 0)) << fix_fl;
     int high = (new_rang_high - t.at<int>(2, 0)) << fix_fl;/////由于RT矩阵都已转化成整型，
-    int boxUP = ((new_rang_high+range_up/2)-t.at<int>(2,0))<< fix_fl;
+    int boxUP = ((new_rang_high+box_up)-t.at<int>(2,0))<< fix_fl;
     float box_world_x, box_world_y, box_world_z;
     if(num){
         for(int i = 0; i < num; i = i + ds ){
@@ -246,8 +247,8 @@ void fallPointFind(Point2f* vertex_original, vector<Point2f>& fallPoints_2D )
     Point midPoint_left = Point((vertex_original[0].x+vertex_original[1].x)/2 , (vertex_original[0].y+vertex_original[1].y)/2) ;
     Point midPoint_right = Point((vertex_original[2].x+vertex_original[3].x)/2 , (vertex_original[2].y+vertex_original[3].y)/2) ;
 
-    int fallPoint_num = 10;
-    int fall_start = int(2*300*(-1));//左2,右3情况
+    int fallPoint_num = 7;
+    int fall_start = int(3*fall_step*(-1));//左3,右2情况
     for (int j = 0; j < fallPoint_num; j++)
     {
         //假设机械臂所在的直线投影是x = 0;
@@ -396,7 +397,7 @@ void drawBox(Mat& depth,const vector<Point3f>& fallPoints_world, const vector<Po
    for (int i = 0; i < fallPoints_world.size(); i++) {
         if (fallPoints_world[i].z <= (height_of_basket)) {
             circle(depth, fallPoints_pixel[i], 2, cv::Scalar(0, 255, 0), 2);
-        } else if (fallPoints_world[i].z <= (height_of_basket+range_up/3)) {
+        } else if (fallPoints_world[i].z <= (height_of_basket+range_up/2)) {
             circle(depth, fallPoints_pixel[i], 2, cv::Scalar(0, 255, 255), 2);
         } else {
             circle(depth, fallPoints_pixel[i], 2, cv::Scalar(0, 0, 255), 2);
@@ -513,7 +514,7 @@ void param()
     filename>>plu;
     cout << "plu----->" << plu << endl;//2
     filename>>x_axisFallPoint;
-    cout << "x_axisFallPoint----->" << x_axisFallPoint << endl;//50
+    cout << "x_axisFallPoint----->" << x_axisFallPoint << endl;//250
 //    filename>>window_size;
 //    cout << "window_size -----> " << window_size << endl;//400
     filename>>pipe_range;
@@ -534,6 +535,8 @@ void param()
     cout<<"v3---------------->"<<v3<<endl;
     filename>>car_high;
     cout<<"car_high---------------->"<<car_high<<endl;
+    filename>>box_up;
+    cout<<"box_up------------------->"<<box_up<<endl;
     filename.close();
     cout << endl;
     clock_t param_end=clock();

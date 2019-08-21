@@ -38,88 +38,75 @@ void control::traversal_control(vector<Point3f>& fallpoint_world,int height_of_b
         w.direction = 0;
     }
     else if(fallpoint_world[0].x<fall_step){
-        CAN_data[6]=0x10; //turn left slowly
+        CAN_data[6]=0x50; //turn left slowly
         w.direction = 2;
         can_send(CAN_id,CAN_dlc,CAN_data);
     }
     else {
-        for (int i = 0; i <fallpoint_world.size(); ++i) {
-            if (fallpoint_world[i].z > height_of_basket) {
-                i++;
-                if(i>fallpoint_world.size()-1)
+//        if(fallpoint_world.size()==1){
+//            if(fallpoint_world[0].x<0){
+//                CAN_data[6]=0x50;
+//                can_send(CAN_id,CAN_dlc,CAN_data);can_send(CAN_id,CAN_dlc,CAN_data);
+//            }
+//            else if(fallpoint_world[0].x>0){
+//                CAN_data[6]=0x05;
+//                can_send(CAN_id,CAN_dlc,CAN_data);can_send(CAN_id,CAN_dlc,CAN_data);
+//            }
+//        }
+        for (int i = 1; i <fallpoint_world.size(); ++i) {
+             if (fallpoint_world[i].z <= height_of_basket+range_up/2) {
+                cout<<"i="<<i<<endl;
+                if (fallpoint_world[i].x == x_axisFallPoint) {
+                   //CAN_data[6]=0x00; //stop?? f1 07 00 00 00 00 00 00
+                    w.direction = 0;
+                    count_l=0;
+                    count_r=0;
+                    cout<<"000000000000"<<endl;
                     break;
-            }
-        if ((fallpoint_world[i].z <= height_of_basket+range_up/2)&&(i!=0)) {
-            cout<<"i="<<i<<endl;
-            if ((fallpoint_world[i].x <= (fall_step/2)) && (fallpoint_world[i].x >= -(fall_step/2))) {
-                //CAN_data[6]=0x00; //stop?? f1 07 00 00 00 00 00 00
-                w.direction = 0;
-                count_l=0;
-                count_r=0;
-                cout<<"000000000000"<<endl;
+                }
+                else if((fallpoint_world[i].x) > (2*fall_step/3) && (++count_r >threshold)) {
+                    count_l = 0;
+                    if (fallpoint_world[i].x < 2*fall_step/3) {
+                        CAN_data[6]=0x01;//turn right slowly
+                        cout<<"1111111111"<<endl;
+                        w.direction = 1;
+                        can_send(CAN_id,CAN_dlc,CAN_data);
+                        break;
+                    }
+                    else if(++count_r>threshold){
+                        CAN_data[6]=0x05;//turn right fast
+                        w.direction = 1;
+                        cout<<"333333333"<<endl;
+                        can_send(CAN_id,CAN_dlc,CAN_data);
+                        break;
+                    }
+
+                }
+                else if ((fallpoint_world[i].x) <0 && (++count_l >threshold)) {
+                    count_r = 0;
+                    if(fallpoint_world[i].x>-2*fall_step){
+                        CAN_data[6]=0x10;//turn left slowly
+                        w.direction = 2;
+                        cout<<"44444444444"<<endl;
+                        can_send(CAN_id,CAN_dlc,CAN_data);
+                        break;
+                    }
+                    else if(++count_l>threshold){
+                        CAN_data[6]=0x50;//turn left fast
+                        w.direction = 2;
+                        cout<<"66666666666"<<endl;
+                        can_send(CAN_id,CAN_dlc,CAN_data);
+                        break;
+                    }
+
+                }
                 break;
             }
-            else if((fallpoint_world[i].x) > (fall_step/2) && (++count_r >2)) {
-                count_l = 0;
-                if (fallpoint_world[i].x < 3*(fall_step/2)) {
-                    CAN_data[6]=0x01;//turn right slowly
-                    cout<<"1111111111"<<endl;
-                    w.direction = 1;
-                    can_send(CAN_id,CAN_dlc,CAN_data);
-                    break;
 
-                }
-/*                else if(fallpoint_world[i].x<5*(fall_step/2)){
-                    CAN_data[2]=30;///转动速度为30,转动角度20,右转
-                    CAN_data[3]=20;
-                    CAN_data[4]=0;
-                    CAN_data[6]=0x50;
-                    w.direction = 1;
-                    cout<<"222222222"<<endl;
-                    break;
-
-                } */else{
-                    CAN_data[6]=0x05;//turn right fast
-                    w.direction = 1;
-                    cout<<"333333333"<<endl;
-                    can_send(CAN_id,CAN_dlc,CAN_data);
-                    break;
-                }
-
-            }
-            else if ((fallpoint_world[i].x) < -(fall_step/2) && (++count_l >2)) {
-                count_r = 0;
-                if(fallpoint_world[i].x>20){
-                    CAN_data[6]=0x10;//turn left slowly
-                    w.direction = 2;
-                    cout<<"44444444444"<<endl;
-                    can_send(CAN_id,CAN_dlc,CAN_data);
-                    break;
-                }
-//                else if(fallpoint_world[i].x>-3*(fall_step/2)){
-//                    CAN_data[2]=30;
-//                    CAN_data[3]=30;
-//                    CAN_data[4]=0;
-//                    CAN_data[6]=0x05;
-//                    w.direction = 2;
-//                    cout<<"5555555555"<<endl;
-//                    break;
-//                }
-                else{
-                    CAN_data[6]=0x50;//turn left fast
-                    w.direction = 2;
-                    cout<<"66666666666"<<endl;
-                    can_send(CAN_id,CAN_dlc,CAN_data);
-                    break;
-                }
-
-            }
-            break;
         }
-
-    }
     }
     //can_send(CAN_id,CAN_dlc,CAN_data);
+
 }
 void control::all_control(vector<Point3f>& fallpoint_world,int height_of_basket, MainWindow &w, const int& fall_step, const vector<Point2f>& fallPoints_2D, const vector<Point3f>& box_UPworld, const int& x_axisFallPoint){
     CAN_id=0x18efff4f;///挡料板控制ID
@@ -147,62 +134,57 @@ void control::all_control(vector<Point3f>& fallpoint_world,int height_of_basket,
         w.direction = 0;
     }
     else if(fallpoint_world[0].x<fall_step){
-        CAN_data[6]=0x10; //turn left slowly
+        CAN_data[6]=0x50; //turn left slowly
         w.direction = 2;
     }
     else {
         for (int i = 0; i <fallpoint_world.size(); ++i) {
-            if (fallpoint_world[i].z > height_of_basket) {
-                i++;
-                if(i>fallpoint_world.size()-1)
+            if ((fallpoint_world[i].z <= height_of_basket+range_up/2)&&(i!=0)) {
+                cout<<"i="<<i<<endl;
+                if (fallpoint_world[i].x == x_axisFallPoint) {
+                    CAN_data[6]=0x00; //stop?? f1 07 00 00 00 00 00 00
+                    w.direction = 0;
+                    count_l=0;
+                    count_r=0;
+                    cout<<"000000000000"<<endl;
                     break;
-            }
-        if ((fallpoint_world[i].z <= height_of_basket+range_up/2)&&(i!=0)) {
-            cout<<"i="<<i<<endl;
-            if ((fallpoint_world[i].x <= (fall_step/2)) && (fallpoint_world[i].x >= -(fall_step/2))) {
-                CAN_data[6]=0x00; //stop?? f1 07 00 00 00 00 00 00
-                w.direction = 0;
-                count_l=0;
-                count_r=0;
-                cout<<"000000000000"<<endl;
+                }
+                else if((fallpoint_world[i].x) > (2*fall_step/3) && (++count_r >threshold)) {
+                    count_l = 0;
+                    if (fallpoint_world[i].x < 2*fall_step) {
+                        CAN_data[6]=0x01;//turn right slowly
+                        cout<<"1111111111"<<endl;
+                        w.direction = 1;                     
+                        break;
+                    }
+                    else if(++count_r>threshold){
+                        CAN_data[6]=0x05;//turn right fast
+                        w.direction = 1;
+                        cout<<"333333333"<<endl;
+                        break;
+                    }
+
+                }
+                else if ((fallpoint_world[i].x) <0 && (++count_l >threshold)) {
+                    count_r = 0;
+                    if(fallpoint_world[i].x>-2*fall_step){
+                        CAN_data[6]=0x10;//turn left slowly
+                        w.direction = 2;
+                        cout<<"44444444444"<<endl;
+                        break;
+                    }
+                    else if(++count_l>threshold){
+                        CAN_data[6]=0x50;//turn left fast
+                        w.direction = 2;
+                        cout<<"66666666666"<<endl;
+                        break;
+                    }
+
+                }
                 break;
             }
-            else if((fallpoint_world[i].x) > (2*fall_step/3) && (++count_r >2)) {
-                count_l = 0;
-                if (fallpoint_world[i].x < 3*fall_step/2) {
-                    CAN_data[6]=0x01;//turn right slowly
-                    cout<<"1111111111"<<endl;
-                    w.direction = 1;
-                    break;
 
-                }
-                else {
-                    CAN_data[6]=0x05;//turn right fast
-                    w.direction = 1;
-                    cout<<"333333333"<<endl;
-                    break;
-                }
-
-            }
-            else if ((fallpoint_world[i].x) < -2*(fall_step/3) && (++count_l >2)) {
-                count_r = 0;
-                if(fallpoint_world[i].x>-3*fall_step/2){
-                    CAN_data[6]=0x10;//turn left slowly
-                    w.direction = 2;
-                    cout<<"44444444444"<<endl;
-                    break;
-                }
-                else {
-                    CAN_data[6]=0x50;//turn left fast
-                    w.direction = 2;
-                    cout<<"66666666666"<<endl;
-                    break;
-                }
-
-            }
-            break;
         }
-    }
     }
 
     cout<<"zongxiangkongzhiVision_start--------------------"<<endl;
@@ -236,11 +218,11 @@ void control::all_control(vector<Point3f>& fallpoint_world,int height_of_basket,
             cout<<"---------------------------------------------------------------------------------------up"<<endl;
         }
     }
+    cout<<"zongxiangkongzhiVision_end--------------------"<<endl;
     if(CAN_data[5]!=0&&CAN_data[6]!=0){
         can_send(CAN_id,CAN_dlc,CAN_data);
     }
 
-     cout<<"zongxiangkongzhiVision_end--------------------"<<endl;
 }
 void control::vertical_control(const vector<Point2f>& fallPoints_2D )  //喷头角度与落点的关系
 {
